@@ -33,7 +33,7 @@ namespace web_api.Controllers
             try
             {
                 string[] values = input.Split(',');
-                if (Int32.TryParse(values[0], out id) && Int32.TryParse(values[6], out quantity))
+                if (values.Length == 7 && Int32.TryParse(values[0], out id) && Int32.TryParse(values[6], out quantity))
                 {
                     name = values[1];
                     description = values[2];
@@ -71,8 +71,6 @@ namespace web_api.Controllers
     [Route("api/[controller]")]
     public class InventoryController : Controller
     {
-        // NOTE(Xavier) A mutex may be neede to avoid colissions from multiple threads???
-        // - Reason discussed below (above constructor)
         private static List<InventoryItem> itemTable = new List<InventoryItem>();
         private static bool itemTableLoadedFromFile = false;
         private static Mutex itemTableLock = new Mutex();
@@ -106,7 +104,9 @@ namespace web_api.Controllers
                         try
                         {
                             InventoryItem item = new InventoryItem(line);
+                            itemTableLock.WaitOne();
                             itemTable.Add(item);
+                            itemTableLock.ReleaseMutex();
                         }
                         catch (Exception)
                         {
@@ -141,7 +141,9 @@ namespace web_api.Controllers
                 try
                 {
                     InventoryItem item = new InventoryItem(values);
+                    itemTableLock.WaitOne();
                     itemTable.Add(item);
+                    itemTableLock.ReleaseMutex();
                 }
                 catch (Exception)
                 {
