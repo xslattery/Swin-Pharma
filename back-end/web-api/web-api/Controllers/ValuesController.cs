@@ -47,14 +47,15 @@ namespace web_api.Controllers
                     // - Then the item will not be created and it will be skipped??
                     // - An error can be sent back to the user??
                     // - i.e. the post failed so an error code is returned??
+                    // For now I guess we can just go with throwing an exception for now:
+                    throw new Exception();
                 }
             }
             catch (Exception)
             {
-
                 throw;
             }
-            
+
         }
 
         public override string ToString()
@@ -101,8 +102,15 @@ namespace web_api.Controllers
                     var file = new StreamReader(path);
                     while ((line = file.ReadLine()) != null)
                     {
-                        InventoryItem item = new InventoryItem(line);
-                        itemTable.Add(item);
+                        try
+                        {
+                            InventoryItem item = new InventoryItem(line);
+                            itemTable.Add(item);
+                        }
+                        catch (Exception)
+                        {
+                            // NOTE(Xavier): Item could not be added
+                        }
                     }
                     file.Close();
                 }
@@ -130,9 +138,18 @@ namespace web_api.Controllers
             System.Diagnostics.Debug.WriteLine("########## POST: " + values);
             Console.WriteLine("########## POST: " + values);
 
-            // NOTE(Xavier): We should add error shecking to se if this fails:
-            InventoryItem item = new InventoryItem(values);
-            itemTable.Add(item);
+            if (!string.IsNullOrEmpty(values))
+            {
+                try
+                {
+                    InventoryItem item = new InventoryItem(values);
+                    itemTable.Add(item);
+                }
+                catch (Exception)
+                {
+                    // NOTE(Xavier): Item could not be added
+                }
+            }
 
             // TODO(Xavier): Save the list to file...
             // - Not sure how often this should be done??
