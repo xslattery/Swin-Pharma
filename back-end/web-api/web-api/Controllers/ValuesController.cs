@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web_api.Controllers
@@ -121,8 +122,6 @@ namespace web_api.Controllers
             }
         }
 
-        // NOTE(Xavier): This will be implemented
-        // when we are at that stage.
         // Used for getting all inventory items:
         //[HttpGet]
         //public IEnumerable<string> Get()
@@ -134,7 +133,7 @@ namespace web_api.Controllers
 
         // Used For getting a single inventory item:
         [HttpPost]
-        public void Post(string values)
+        public IActionResult Post(string values)
         {
             if (!string.IsNullOrEmpty(values))
             {
@@ -144,12 +143,15 @@ namespace web_api.Controllers
                     itemTableLock.WaitOne();
                     itemTable.Add(item);
                     itemTableLock.ReleaseMutex();
+                    return Ok();
                 }
                 catch (Exception)
                 {
-                    // NOTE(Xavier): Item could not be added
+                    return StatusCode(400);
                 }
             }
+
+            return StatusCode(400);
 
             // TODO(Xavier): Save the list to file...
             // - Not sure how often this should be done??
