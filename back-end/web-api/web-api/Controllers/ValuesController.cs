@@ -6,6 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace web_api.Controllers
 {
+    // Databases
+
+    [Route("inventory/[controller]")]
+    public class InventoryController : Controller
+    {
+        // GET inventory/values (ALL VALUES)
+    }
+
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
