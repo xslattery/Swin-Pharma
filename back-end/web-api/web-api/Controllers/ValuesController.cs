@@ -91,15 +91,14 @@ namespace web_api.Controllers
                 //
                 // Get the directory where the database (csv files) are stored:
                 string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../"); // bin folder
+                path += "inventory.csv";
 
                 // Try and find the database file:
-                if (System.IO.File.Exists(path + "inventory.csv"))
+                if (System.IO.File.Exists(path))
                 {
-                    string path2 = path + "inventory.csv";
-
                     // Load everything into the list:
                     string line;
-                    var file = new StreamReader(path2);
+                    var file = new StreamReader(path);
                     while ((line = file.ReadLine()) != null)
                     {
                         InventoryItem item = new InventoryItem(line);
