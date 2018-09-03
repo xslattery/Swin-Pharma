@@ -14,13 +14,13 @@ namespace web_api.Controllers
     // different file if you want, I don't mind.
     public class InventoryItem
     {
-        private int id;
-        private string name;
-        private string description;
-        private string barcode;
-        private string purchasePrice;
-        private string retailPrice;
-        private int quantity;
+        public int id;
+        public string name;
+        public string description;
+        public string barcode;
+        public string purchasePrice;
+        public string retailPrice;
+        public int quantity;
 
         // NOTE(Xavier): There is more to concider here...
         // If any of the members have a comma inside them then passing them will fail.
@@ -117,7 +117,32 @@ namespace web_api.Controllers
         //{
         //    System.Diagnostics.Debug.WriteLine("########## GET Inventory");
         //    Console.WriteLine("########## GET Inventory");
-        //    return new string[] { "Item 1", "Item 2" };
+
+        //    List<string> result = new List<string>();
+        //    foreach (var entry in itemTable)
+        //    {
+        //        result.Add(entry.ToString());
+        //    }
+
+        //    return result;
+        //}
+
+        //// Used for getting a single inventory item:
+        //[HttpGet("{id}")]
+        //public string Get(int id)
+        //{
+        //    System.Diagnostics.Debug.WriteLine("########## GET ID Inventory");
+        //    Console.WriteLine("########## GET ID Inventory");
+
+        //    List<string> result = new List<string>();
+        //    foreach (var entry in itemTable)
+        //    {
+        //        if (entry.id == id)
+        //        {
+        //            return entry.ToString();
+        //        }
+        //    }
+        //    return ""; // NOTE(Xavier): maybe this should be an error code instead of an empty string.
         //}
 
         // Used For adding a single inventory item:
