@@ -1,0 +1,11 @@
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\bin\Debug\netcoreapp2.0\exampleCore.deps.json
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\bin\Debug\netcoreapp2.0\exampleCore.runtimeconfig.json
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\bin\Debug\netcoreapp2.0\exampleCore.runtimeconfig.dev.json
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\bin\Debug\netcoreapp2.0\exampleCore.dll
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\bin\Debug\netcoreapp2.0\exampleCore.pdb
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\obj\Debug\netcoreapp2.0\exampleCore.csprojAssemblyReference.cache
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\obj\Debug\netcoreapp2.0\exampleCore.csproj.CoreCompileInputs.cache
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\obj\Debug\netcoreapp2.0\exampleCore.AssemblyInfoInputs.cache
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\obj\Debug\netcoreapp2.0\exampleCore.AssemblyInfo.cs
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\obj\Debug\netcoreapp2.0\exampleCore.dll
+C:\Users\Daniel Ferguson\Desktop\exampleCore\exampleCore\obj\Debug\netcoreapp2.0\exampleCore.pdb
