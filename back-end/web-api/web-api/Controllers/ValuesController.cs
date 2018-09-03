@@ -8,14 +8,32 @@ namespace web_api.Controllers
 {
     // Databases
 
-    [Route("inventory/[controller]")]
+    // Console.WriteLine("PATH: " + System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+    [Route("api/[controller]")]
     public class InventoryController : Controller
     {
-        // GET inventory/values (ALL VALUES)
+        [HttpGet]
+        public IEnumerable<string> Get()
+        {
+            System.Diagnostics.Debug.WriteLine("########## GET Inventory");
+            Console.WriteLine("########## GET Inventory");
 
-        // GET between two dates
+            return new string[] { "Item 1", "Item 2" };
+        }
+    }
 
-        // PUT 
+    [Route("api/[controller]")]
+    public class SalesController : Controller
+    {
+        [HttpGet]
+        public IEnumerable<string> Get()
+        {
+            System.Diagnostics.Debug.WriteLine("########## GET Sales");
+            Console.WriteLine("########## GET Sales");
+
+            return new string[] { "Sale 1", "Sale 2" };
+        }
     }
 
     [Route("api/[controller]")]
@@ -28,7 +46,7 @@ namespace web_api.Controllers
             System.Diagnostics.Debug.WriteLine("########## GET");
             Console.WriteLine("########## GET");
 
-            Console.WriteLine("PATH: " + System.Diagnostics.Process.GetCurrentProcess());
+            Console.WriteLine("PATH: " + System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             return new string[] { "value1", "value2" };
         }
