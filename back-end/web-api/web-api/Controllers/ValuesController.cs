@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web_api.Controllers
 {
-    // Databases
-
-    // NOTE(Xavier): leave this comment for now
-    // Console.WriteLine("PATH: " + System.Reflection.Assembly.GetExecutingAssembly().Location);
-
     // NOTE(Xavier): This class can be moved into a
     // different file if you want, I don't mind.
     public class InventoryItem
@@ -33,14 +30,21 @@ namespace web_api.Controllers
         public InventoryItem(string input)
         {
             string[] values = input.Split(',');
-            if (Int32.TryParse(values[0], out id))
+            if (Int32.TryParse(values[0], out id) && Int32.TryParse(values[6], out quantity))
             {
-
+                name = values[1];
+                description = values[2];
+                barcode = values[3];
+                purchasePrice = values[4];
+                retailPrice = values[5];
             }
             else
             {
                 // NOTE(Xavier): How should be handle this??
-                // Should we throw an exception if it fails?
+                // - Should we throw an exception if it fails?
+                // - Then the item will not be created and it will be skipped??
+                // - An error can be sent back to the user??
+                // - i.e. the post failed so an error code is returned??
             }
         }
 
@@ -51,9 +55,57 @@ namespace web_api.Controllers
         }
     }
 
+    /// //////////////////////////////////////////////////////////
+
     [Route("api/[controller]")]
     public class InventoryController : Controller
     {
+        // NOTE(Xavier) A mutex may be neede to avoid colissions from multiple threads???
+        // - Reason discussed below (above constructor)
+        private static List<InventoryItem> itemTable = new List<InventoryItem>();
+        private static bool itemTableLoadedFromFile = false;
+
+        // NOTE(Xavier): A constructor is required to load the Inventory from a csv file.
+        // However I have realised that we probaly should not store the list of items 
+        // in this calss because many instances of this class will be created for the requests.
+        // - Am I wrong about this??? (I just checked and the constructor is called with every request)
+        // For not I have made the list static and added a boolean check to make sure
+        // the list is only loaded once.
+        public InventoryController() : base()
+        {
+            if (!itemTableLoadedFromFile)
+            {
+                itemTableLoadedFromFile = true;
+
+
+                // FIXME(Xavier): Do forward slashes '/' work on windows for paths???
+                //
+                // Get the directory where the database (csv files) are stored:
+                string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../res/");
+                path = "/Users/xavier/Desktop/";
+
+                // Try and find the database file:
+                if (System.IO.File.Exists(path + "inventory.db.csv"))
+                {
+                    // Load everything into the list:
+                    string line;
+                    // FIXME(Xavier): I am getting an error when it tries to open the file:
+                    // - I get a permission denied!
+                    // - It doesn't matter what folder it is in I still get the error.
+                    var file = new System.IO.StreamReader(path);
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        InventoryItem item = new InventoryItem(line);
+                        itemTable.Add(item);
+                    }
+                    file.Close();
+                }
+
+                System.Diagnostics.Debug.WriteLine("########## PATH: " + path);
+                Console.WriteLine("########## PATH: " + path);
+            }
+        }
+
         // NOTE(Xavier): This will be implemented
         // when we are at that stage.
         // Used for getting all inventory items:
@@ -69,8 +121,19 @@ namespace web_api.Controllers
         [HttpPost]
         public void Post(string values)
         {
-            System.Diagnostics.Debug.WriteLine("########## POST" + values);
-            Console.WriteLine("########## POST" + values);
+            System.Diagnostics.Debug.WriteLine("########## POST: " + values);
+            Console.WriteLine("########## POST: " + values);
+
+            // NOTE(Xavier): We should add error shecking to se if this fails:
+            InventoryItem item = new InventoryItem(values);
+            itemTable.Add(item);
+
+            // TODO(Xavier): Save the list to file...
+            // - Not sure how often this should be done??
+            // - Maybe only when the destructor is called??
+            // - A mutex will be required to avid collisions.
+            //   due to how multiple instances of this class can
+            //   exist at once.
         }
     }
 
