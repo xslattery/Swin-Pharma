@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
@@ -74,6 +75,7 @@ namespace web_api.Controllers
         // - Reason discussed below (above constructor)
         private static List<InventoryItem> itemTable = new List<InventoryItem>();
         private static bool itemTableLoadedFromFile = false;
+        private static Mutex itemTableLock = new Mutex();
 
         // NOTE(Xavier): A constructor is required to load the Inventory from a csv file.
         // However I have realised that we probaly should not store the list of items 
