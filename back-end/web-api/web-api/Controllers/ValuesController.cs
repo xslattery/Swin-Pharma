@@ -45,10 +45,6 @@ namespace web_api.Controllers
                 else
                 {
                     // NOTE(Xavier): How should be handle this??
-                    // - Should we throw an exception if it fails?
-                    // - Then the item will not be created and it will be skipped??
-                    // - An error can be sent back to the user??
-                    // - i.e. the post failed so an error code is returned??
                     // For now I guess we can just go with throwing an exception for now:
                     throw new Exception(); // I dont think it matters what type of exception, only the fact that one is thrown.
                 }
@@ -75,31 +71,24 @@ namespace web_api.Controllers
         private static List<InventoryItem> itemTable = new List<InventoryItem>();
         private static bool itemTableLoadedFromFile = false;
         private static Mutex itemTableLock = new Mutex();
+        private static string inventoryDatabaseFile;
 
-        // NOTE(Xavier): A constructor is required to load the Inventory from a csv file.
-        // However I have realised that we probaly should not store the list of items 
-        // in this calss because many instances of this class will be created for the requests.
-        // - Am I wrong about this??? (I just checked and the constructor is called with every request)
-        // For not I have made the list static and added a boolean check to make sure
-        // the list is only loaded once.
         public InventoryController() : base()
         {
             if (!itemTableLoadedFromFile)
             {
                 itemTableLoadedFromFile = true;
 
-                // FIXME(Xavier): Do forward slashes '/' work on windows for paths???
-                //
                 // Get the directory where the database (csv files) are stored:
-                string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../"); // bin folder
-                path += "inventory.csv";
+                inventoryDatabaseFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../"); // bin folder
+                inventoryDatabaseFile += "inventory.csv";
 
                 // Try and find the database file:
-                if (System.IO.File.Exists(path))
+                if (System.IO.File.Exists(inventoryDatabaseFile))
                 {
                     // Load everything into the list:
                     string line;
-                    var file = new StreamReader(path);
+                    var file = new StreamReader(inventoryDatabaseFile);
                     while ((line = file.ReadLine()) != null)
                     {
                         try
@@ -111,14 +100,14 @@ namespace web_api.Controllers
                         }
                         catch (Exception)
                         {
-                            // NOTE(Xavier): Item could not be added
+                            // Item could not be added
                         }
                     }
                     file.Close();
                 }
 
-                System.Diagnostics.Debug.WriteLine("########## PATH: " + path);
-                Console.WriteLine("########## PATH: " + path);
+                System.Diagnostics.Debug.WriteLine("########## PATH: " + inventoryDatabaseFile);
+                Console.WriteLine("########## PATH: " + inventoryDatabaseFile);
             }
         }
 
@@ -131,7 +120,7 @@ namespace web_api.Controllers
         //    return new string[] { "Item 1", "Item 2" };
         //}
 
-        // Used For getting a single inventory item:
+        // Used For adding a single inventory item:
         [HttpPost]
         public IActionResult Post(string values)
         {
@@ -143,6 +132,21 @@ namespace web_api.Controllers
                     itemTableLock.WaitOne();
                     itemTable.Add(item);
                     itemTableLock.ReleaseMutex();
+
+                    System.Diagnostics.Debug.WriteLine("########## POST: " + values);
+                    Console.WriteLine("########## POST: " + values);
+
+                    // NOTE(Xavier): This is probably not the best idea
+                    // because it will be called for each request.
+                    itemTableLock.WaitOne();
+                    var file = new StreamWriter(inventoryDatabaseFile);
+                    foreach (var entry in itemTable)
+                    {
+                        file.WriteLine(entry.ToString());
+                    }
+                    file.Close();
+                    itemTableLock.ReleaseMutex();
+
                     return Ok();
                 }
                 catch (Exception)
@@ -150,18 +154,7 @@ namespace web_api.Controllers
                     return StatusCode(400);
                 }
             }
-
             return StatusCode(400);
-
-            // TODO(Xavier): Save the list to file...
-            // - Not sure how often this should be done??
-            // - Maybe only when the destructor is called??
-            // - A mutex will be required to avid collisions.
-            //   due to how multiple instances of this class can
-            //   exist at once.
-
-            System.Diagnostics.Debug.WriteLine("########## POST: " + values);
-            Console.WriteLine("########## POST: " + values);
         }
     }
 
@@ -187,54 +180,3 @@ namespace web_api.Controllers
     //}
 
 }
-
-
-/* This is the old api/values controller example:
----------------------------------------------------------
-    [Route("api/[controller]")]
-    public class ValuesController : Controller
-    {
-        // GET api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            System.Diagnostics.Debug.WriteLine("########## GET");
-            Console.WriteLine("########## GET");
-
-            Console.WriteLine("PATH: " + System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            System.Diagnostics.Debug.WriteLine("########## GET ID");
-            Console.WriteLine("########## GET ID");
-            return "value";
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post(string values)
-        {
-            System.Diagnostics.Debug.WriteLine("########## POST" + values);
-            Console.WriteLine("########## POST" + values);
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
-    }
---------------------------------------------------------------
- */
