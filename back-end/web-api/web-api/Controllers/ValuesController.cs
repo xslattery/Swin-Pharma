@@ -29,23 +29,32 @@ namespace web_api.Controllers
         // seperated list of attributes:
         public InventoryItem(string input)
         {
-            string[] values = input.Split(',');
-            if (Int32.TryParse(values[0], out id) && Int32.TryParse(values[6], out quantity))
+            try
             {
-                name = values[1];
-                description = values[2];
-                barcode = values[3];
-                purchasePrice = values[4];
-                retailPrice = values[5];
+                string[] values = input.Split(',');
+                if (Int32.TryParse(values[0], out id) && Int32.TryParse(values[6], out quantity))
+                {
+                    name = values[1];
+                    description = values[2];
+                    barcode = values[3];
+                    purchasePrice = values[4];
+                    retailPrice = values[5];
+                }
+                else
+                {
+                    // NOTE(Xavier): How should be handle this??
+                    // - Should we throw an exception if it fails?
+                    // - Then the item will not be created and it will be skipped??
+                    // - An error can be sent back to the user??
+                    // - i.e. the post failed so an error code is returned??
+                }
             }
-            else
+            catch (Exception)
             {
-                // NOTE(Xavier): How should be handle this??
-                // - Should we throw an exception if it fails?
-                // - Then the item will not be created and it will be skipped??
-                // - An error can be sent back to the user??
-                // - i.e. the post failed so an error code is returned??
+
+                throw;
             }
+            
         }
 
         public override string ToString()
@@ -84,14 +93,13 @@ namespace web_api.Controllers
                 string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../"); // bin folder
 
                 // Try and find the database file:
-                if (System.IO.File.Exists(path + "inventory.db.csv"))
+                if (System.IO.File.Exists(path + "inventory.csv"))
                 {
+                    string path2 = path + "inventory.csv";
+
                     // Load everything into the list:
                     string line;
-                    // FIXME(Xavier): I am getting an error when it tries to open the file:
-                    // - I get a permission denied!
-                    // - It doesn't matter what folder it is in I still get the error.
-                    var file = new System.IO.StreamReader(path);
+                    var file = new StreamReader(path2);
                     while ((line = file.ReadLine()) != null)
                     {
                         InventoryItem item = new InventoryItem(line);
