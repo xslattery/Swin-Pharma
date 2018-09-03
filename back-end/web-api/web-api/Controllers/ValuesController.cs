@@ -81,8 +81,7 @@ namespace web_api.Controllers
                 // FIXME(Xavier): Do forward slashes '/' work on windows for paths???
                 //
                 // Get the directory where the database (csv files) are stored:
-                string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../../res/");
-                path = "/Users/xavier/Desktop/";
+                string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../"); // bin folder
 
                 // Try and find the database file:
                 if (System.IO.File.Exists(path + "inventory.db.csv"))
