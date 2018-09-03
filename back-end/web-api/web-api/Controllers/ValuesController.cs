@@ -8,34 +8,99 @@ namespace web_api.Controllers
 {
     // Databases
 
+    // NOTE(Xavier): leave this comment for now
     // Console.WriteLine("PATH: " + System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+    // NOTE(Xavier): This class can be moved into a
+    // different file if you want, I don't mind.
+    public class InventoryItem
+    {
+        private int id;
+        private string name;
+        private string description;
+        private string barcode;
+        private string purchasePrice;
+        private string retailPrice;
+        private int quantity;
+
+        // NOTE(Xavier): There is more to concider here...
+        // If any of the members have a comma inside them then passing them will fail.
+        // maybe we could concider surrounding them in '{ }'??? Then only the contents
+        // of the brackets will be included.
+        //
+        // Create an inventory item from a comma
+        // seperated list of attributes:
+        public InventoryItem(string input)
+        {
+            string[] values = input.Split(',');
+            if (Int32.TryParse(values[0], out id))
+            {
+
+            }
+            else
+            {
+                // NOTE(Xavier): How should be handle this??
+                // Should we throw an exception if it fails?
+            }
+        }
+
+        public override string ToString()
+        {
+            string result = id.ToString() + "," + name + "," + description + "," + barcode + "," + purchasePrice + "," + retailPrice + "," + quantity;
+            return result;
+        }
+    }
 
     [Route("api/[controller]")]
     public class InventoryController : Controller
     {
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            System.Diagnostics.Debug.WriteLine("########## GET Inventory");
-            Console.WriteLine("########## GET Inventory");
+        // NOTE(Xavier): This will be implemented
+        // when we are at that stage.
+        // Used for getting all inventory items:
+        //[HttpGet]
+        //public IEnumerable<string> Get()
+        //{
+        //    System.Diagnostics.Debug.WriteLine("########## GET Inventory");
+        //    Console.WriteLine("########## GET Inventory");
+        //    return new string[] { "Item 1", "Item 2" };
+        //}
 
-            return new string[] { "Item 1", "Item 2" };
+        // Used For getting a single inventory item:
+        [HttpPost]
+        public void Post(string values)
+        {
+            System.Diagnostics.Debug.WriteLine("########## POST" + values);
+            Console.WriteLine("########## POST" + values);
         }
     }
 
-    [Route("api/[controller]")]
-    public class SalesController : Controller
-    {
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            System.Diagnostics.Debug.WriteLine("########## GET Sales");
-            Console.WriteLine("########## GET Sales");
+    // NOTE(Xavier): This will be implemented
+    // when we are at that stage.
+    //[Route("api/[controller]")]
+    //public class SalesController : Controller
+    //{
+    //[HttpGet]
+    //public IEnumerable<string> Get()
+    //{
+    //    System.Diagnostics.Debug.WriteLine("########## GET Sales");
+    //    Console.WriteLine("########## GET Sales");
+    //    return new string[] { "Sale 1", "Sale 2" };
+    //}
 
-            return new string[] { "Sale 1", "Sale 2" };
-        }
-    }
+    //[HttpPost]
+    //public void Post(string values)
+    //{
+    //    System.Diagnostics.Debug.WriteLine("########## POST" + values);
+    //    Console.WriteLine("########## POST" + values);
+    //}
+    //}
 
+
+}
+
+
+/* This is the old api/values controller example:
+---------------------------------------------------------
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
@@ -81,4 +146,5 @@ namespace web_api.Controllers
         {
         }
     }
-}
+--------------------------------------------------------------
+ */
