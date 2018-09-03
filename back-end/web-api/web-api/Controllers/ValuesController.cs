@@ -48,7 +48,7 @@ namespace web_api.Controllers
                     // - An error can be sent back to the user??
                     // - i.e. the post failed so an error code is returned??
                     // For now I guess we can just go with throwing an exception for now:
-                    throw new Exception();
+                    throw new Exception(); // I dont think it matters what type of exception, only the fact that one is thrown.
                 }
             }
             catch (Exception)
@@ -86,7 +86,6 @@ namespace web_api.Controllers
             if (!itemTableLoadedFromFile)
             {
                 itemTableLoadedFromFile = true;
-
 
                 // FIXME(Xavier): Do forward slashes '/' work on windows for paths???
                 //
@@ -135,9 +134,6 @@ namespace web_api.Controllers
         [HttpPost]
         public void Post(string values)
         {
-            System.Diagnostics.Debug.WriteLine("########## POST: " + values);
-            Console.WriteLine("########## POST: " + values);
-
             if (!string.IsNullOrEmpty(values))
             {
                 try
@@ -157,6 +153,9 @@ namespace web_api.Controllers
             // - A mutex will be required to avid collisions.
             //   due to how multiple instances of this class can
             //   exist at once.
+
+            System.Diagnostics.Debug.WriteLine("########## POST: " + values);
+            Console.WriteLine("########## POST: " + values);
         }
     }
 
@@ -180,7 +179,6 @@ namespace web_api.Controllers
     //    Console.WriteLine("########## POST" + values);
     //}
     //}
-
 
 }
 
