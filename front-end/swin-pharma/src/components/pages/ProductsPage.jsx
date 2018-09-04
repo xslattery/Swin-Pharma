@@ -69,13 +69,7 @@ const rows = [
 class SalesPage extends Component {
     postForm(e) {
         e.preventDefault();
-        var data = new FormData();
-        data.append('Name', 'name');
-        data.append('Description', 'description');
-        data.append('Barcode', 'barcode');
-        data.append('PurchasePrice', 'purchasePrice');
-        data.append('RetailPrice', 'retailPrice');
-        data.append('Quanity', 10);
+        var data = new FormData(e.target);
         axios({
             method: 'post',
             url: appConfig.serverRoot + 'api/Inventory',
@@ -102,6 +96,7 @@ class SalesPage extends Component {
                                 <TextField
                                     fullWidth
                                     label="Product Name"
+                                    name="Name"
                                     pattern="[a-zA-Z \-_\\!\#\$\(\)]"
                                 />
                             </Grid>
@@ -110,31 +105,45 @@ class SalesPage extends Component {
                                     fullWidth
                                     multiline
                                     rowsMax="4"
+                                    name="Description"
                                     label="Description"
                                 />
                             </Grid>
-                            <Grid item md={4} sm={12}>
+                            <Grid item md={3} sm={12}>
                                 <TextField
                                     fullWidth
                                     label="SKU"
+                                    name="Barcode"
                                     pattern="[a-zA-Z \-_\\!\#\$\(\)]"
                                 />
                             </Grid>
-                            <Grid item md={4} sm={12}>
+                            <Grid item md={3} sm={12}>
                                 <FormControl fullWidth>
                                     <InputLabel htmlFor="s">Wholesale Cost</InputLabel>
                                     <Input
                                         startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                        name="PurchasePrice"
+                                        type="number"
                                     />
                                 </FormControl>
                             </Grid>
-                            <Grid item md={4} sm={12}>
+                            <Grid item md={3} sm={12}>
                                 <FormControl fullWidth>
                                     <InputLabel htmlFor="s">Retail Price</InputLabel>
                                     <Input
                                         startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                        name="RetailPrice"
+                                        type="number"
                                     />
                                 </FormControl>
+                            </Grid>
+                            <Grid item md={3} sm={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Stock Level"
+                                    name="Quantity"
+                                    type="number"
+                                />
                             </Grid>
                             <Grid item md={12}>
                                 <Button
