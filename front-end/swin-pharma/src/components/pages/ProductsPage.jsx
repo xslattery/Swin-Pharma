@@ -78,7 +78,7 @@ class SalesPage extends Component {
         data.append('Quanity', 10);
         axios({
             method: 'post',
-            url: appConfig.serverRoot + 'api/inventory',
+            url: appConfig.serverRoot + 'api/Inventory',
             data: data,
             config: { headers: { 'Content-Type': 'multipart/form-data' } }
         })
