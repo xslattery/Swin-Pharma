@@ -92,7 +92,7 @@ namespace web_api.Controllers
 
         public override string ToString()
         {
-            string result = id.ToString() + "," + name + "," + description + "," + barcode + "," + purchasePrice + "," + retailPrice + "," + quantity;
+            string result = id.ToString() + "," + name.Replace(",", "") + "," + description.Replace(",", "") + "," + barcode.Replace(",", "") + "," + purchasePrice.Replace(",", "") + "," + retailPrice.Replace(",", "") + "," + quantity;
             return result;
         }
     }
