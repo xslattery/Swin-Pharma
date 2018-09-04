@@ -26,7 +26,7 @@ class SalesPage extends Component {
         return (
             <React.Fragment>
                 <ViewFrame>
-                    <h2 className="no-margin">Sales</h2>
+                    <h2 className="no-margin">Reports</h2>
                 </ViewFrame>
                 <ViewFrame>
                     <h1 className="no-margin">redux test: {this.props.test}</h1>

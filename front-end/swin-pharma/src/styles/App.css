@@ -5,6 +5,10 @@
 
 .covert-link{text-decoration:none;color:inherit;}
 
+.left-icon { margin-right: 6px; }
+.right-icon { margin-left: 6px; }
+.icon-small { font-size: 20px; }
+
 /* GLOBAL */
 
 body {
@@ -76,6 +80,9 @@ body {
 }
 
 .gl-frame{
-  margin: 2rem;
-  padding: 1rem
+  margin: 1rem 2rem 2rem 2rem;
+}
+
+.gl-heading{
+  margin: 2rem 2rem 0 2rem;
 }

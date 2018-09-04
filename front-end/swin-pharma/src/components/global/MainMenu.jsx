@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -15,62 +16,60 @@ class MainMenu extends Component {
             <React.Fragment>
                 <div id="gl-main-menu">
                     <List component="nav">
-                        <a className="covert-link" href="/sales">
+                        <Link className="covert-link" to="/sales">
                             <ListItem
                                 button
-                                selected={true}
+                                selected={window.location.pathname === "/sales"}
                             >
                                 <ListItemIcon>
                                     <BubbleChartIcon />
                                 </ListItemIcon>
                                 <ListItemText primary="Sales" />
                             </ListItem>
-                        </a>
-                        <a className="covert-link" href="/inventory">
+                        </Link>
+                        <Link className="covert-link" to="/products">
                             <ListItem
                                 button
-                                onClick={event => this.handleListItemClick(event, 0)}
+                                selected={window.location.pathname === "/products"}
                             >
                                 <ListItemIcon>
                                     <AppsIcon />
                                 </ListItemIcon>
-                                <ListItemText primary="Inventory" />
+                                <ListItemText primary="Products" />
                             </ListItem>
-                        </a>
-                        <a className="covert-link" href="/reports">
+                        </Link>
+                        <Link className="covert-link" to="/reports">
                             <ListItem
                                 button
-                                onClick={event => this.handleListItemClick(event, 1)}
+                                selected={window.location.pathname === "/reports"}
                             >
                                 <ListItemIcon>
                                     <BarChartIcon />
                                 </ListItemIcon>
                                 <ListItemText primary="Reports" />
                             </ListItem>
-                        </a>
-                        <a className="covert-link" href="/alerts">
+                        </Link>
+                        <Link className="covert-link" to="/alerts">
                             <ListItem
                                 button
-                                onClick={event => this.handleListItemClick(event, 1)}
+                                selected={window.location.pathname === "/alerts"}
                             >
                                 <ListItemIcon>
                                     <NotificationsIcon />
                                 </ListItemIcon>
                                 <ListItemText primary="Alerts" />
                             </ListItem>
-                        </a>
+                        </Link>
                     </List>
                     <Divider />
                     <List component="nav">
                         <ListItem
                             button
-                            onClick={event => this.handleListItemClick(event, 2)}
                         >
                             <ListItemText primary="Trash" />
                         </ListItem>
                         <ListItem
                             button
-                            onClick={event => this.handleListItemClick(event, 3)}
                         >
                             <ListItemText primary="Spam" />
                         </ListItem>

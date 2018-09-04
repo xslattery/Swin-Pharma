@@ -7,11 +7,11 @@ const composedEnhancers = compose(middlewareEnhancer);
 
 export default () => {
     var initialState = {
-        test: "aaa"
+        test: "test working"
     };
     return createStore(
         rootReducer,
         initialState,
-        // composedEnhancers,
+        composedEnhancers,
     );
 }

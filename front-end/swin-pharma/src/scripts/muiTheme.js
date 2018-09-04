@@ -3,10 +3,10 @@ import { createMuiTheme } from '@material-ui/core/styles';
 export default createMuiTheme({
     palette: {
         primary: {
-            main: '#EA2027'
+            main: '#1289A7'
         },
         secondary: {
-            main: '#1289A7'
+            main: '#EA2027'
         }
     },
     typography: {
@@ -34,31 +34,31 @@ export default createMuiTheme({
             boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
         },
     },
-    shadows: [
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-        '0px 0px 0px #fff',
-    ]
+    // shadows: [
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    //     '0px 0px 0px #fff',
+    // ]
 });
