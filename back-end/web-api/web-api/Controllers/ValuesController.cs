@@ -153,8 +153,8 @@ namespace web_api.Controllers
             {
                 try
                 {
-                    InventoryItem item = new InventoryItem(values);
                     itemTableLock.WaitOne();
+                    InventoryItem item = new InventoryItem((itemTable.Count + 1).ToString() + ","+ values);
                     itemTable.Add(item);
                     itemTableLock.ReleaseMutex();
 
