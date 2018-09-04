@@ -1,5 +1,2 @@
-1,a,b,c,d,e,1
-2,a,b,c,d,e,2
-3,a,b,c,d,e,3
-4,a,b,c,d,e,4
-5,name,description,barcode,purchasePrice,retailPrice,0
+1,Pooch,Desc,10011000,10,20,400
+2,SomethingName,Desc,10011000,10,20,2

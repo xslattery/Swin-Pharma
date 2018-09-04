@@ -211,14 +211,20 @@ namespace web_api.Controllers
                     file.Close();
                     itemTableLock.ReleaseMutex();
 
-                    return Ok();
+                    // 200 - Success
+                    return StatusCode(200);
                 }
                 catch (Exception)
                 {
-                    return StatusCode(400);
+                    // 403 - Forbidden. The request was legal but the server is refusing to respond to it.
+                    // The Model is incomplete.
+                    return StatusCode(403);
                 }
+            } else
+            {
+                // 400 - Failure
+                return StatusCode(400);
             }
-            return StatusCode(400);
         }
     }
 
