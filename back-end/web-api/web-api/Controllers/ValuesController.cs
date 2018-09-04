@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web_api.Controllers
@@ -91,7 +92,7 @@ namespace web_api.Controllers
 
         public override string ToString()
         {
-            string result = id.ToString() + "," + name + "," + description + "," + barcode + "," + purchasePrice + "," + retailPrice + "," + quantity;
+            string result = id.ToString() + "," + name.Replace(",", "") + "," + description.Replace(",", "") + "," + barcode.Replace(",", "") + "," + purchasePrice.Replace(",", "") + "," + retailPrice.Replace(",", "") + "," + quantity;
             return result;
         }
     }
@@ -210,14 +211,20 @@ namespace web_api.Controllers
                     file.Close();
                     itemTableLock.ReleaseMutex();
 
-                    return Ok();
+                    // 200 - Success
+                    return StatusCode(200);
                 }
                 catch (Exception)
                 {
-                    return StatusCode(400);
+                    // 403 - Forbidden. The request was legal but the server is refusing to respond to it.
+                    // The Model is incomplete.
+                    return StatusCode(403);
                 }
+            } else
+            {
+                // 400 - Failure
+                return StatusCode(400);
             }
-            return StatusCode(400);
         }
     }
 
