@@ -81,6 +81,8 @@ class SalesPage extends Component {
             })
             .catch(function (error) {
                 console.log(error);
+                alert('An unexpected error occurred while adding a new product.');
+                window.location.reload();
             });
     }
     render() {

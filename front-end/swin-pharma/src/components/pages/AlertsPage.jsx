@@ -4,6 +4,7 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
+import ViewHeading from '../global/ViewHeading';
 import TableRow from '@material-ui/core/TableRow';
 import { connect } from 'react-redux';
 
@@ -25,13 +26,10 @@ class SalesPage extends Component {
     render() {
         return (
             <React.Fragment>
-                <ViewFrame>
-                    <h2 className="no-margin">Alerts</h2>
-                </ViewFrame>
-                <ViewFrame>
-                    <h1 className="no-margin">redux test: {this.props.test}</h1>
-                </ViewFrame>
-                <ViewFrame styles={{ padding: 0 }}>
+                <ViewHeading variant="title">
+                    Alerts
+                </ViewHeading>
+                <ViewFrame padding={0}>
                     <Table>
                         <TableHead>
                             <TableRow>
