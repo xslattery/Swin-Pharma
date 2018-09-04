@@ -69,15 +69,19 @@ const rows = [
 class SalesPage extends Component {
     postForm(e) {
         e.preventDefault();
-        axios.post(
-            appConfig.serverRoot + 'api/inventory', {
-                name: 'Prod Name Test',
-                description: 'Prod description lorem ipsum dolor',
-                sku: 'P123456',
-                wholesaleCost: 123,
-                retailPrice: 123,
-                quantity: 3
-            })
+        var data = new FormData();
+        data.append('Name', 'name');
+        data.append('Description', 'description');
+        data.append('Barcode', 'barcode');
+        data.append('PurchasePrice', 'purchasePrice');
+        data.append('RetailPrice', 'retailPrice');
+        data.append('Quanity', 10);
+        axios({
+            method: 'post',
+            url: appConfig.serverRoot + 'api/inventory',
+            data: data,
+            config: { headers: { 'Content-Type': 'multipart/form-data' } }
+        })
             .then(function (response) {
                 console.log(response);
             })
