@@ -1,17 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web_api.Controllers
 {
-    // NOTE(Xavier): This class can be moved into a
-    // different file if you want, I don't mind.
+    public class InventoryItemPostRecieve
+    {
+        [Key]
+        [Required]
+        [DataType(DataType.Text)]
+        public string Name { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        public string Description { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        public string Barcode { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        public string PurchasePrice { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        public string RetailPrice { get; set; }
+
+        [Required]
+        public int Quantity { get; set; }
+    }
+
     public class InventoryItem
     {
         public int id;
@@ -22,7 +45,18 @@ namespace web_api.Controllers
         public string retailPrice;
         public int quantity;
 
-        // NOTE(Xavier): There is more to concider here...
+        public InventoryItem(int _id, string _name, string _description, string _barcode, string _purchasePrice, string _retailPrice, int _quantity)
+        {
+            id = _id;
+            name = _name;
+            description = _description;
+            barcode = _barcode;
+            purchasePrice = _purchasePrice;
+            retailPrice = _retailPrice;
+            quantity = _quantity;
+        }
+
+        // FIXME(Xavier): There is more to concider here...
         // If any of the members have a comma inside them then passing them will fail.
         // maybe we could concider surrounding them in '{ }'??? Then only the contents
         // of the brackets will be included.
@@ -53,7 +87,6 @@ namespace web_api.Controllers
             {
                 throw;
             }
-
         }
 
         public override string ToString()
@@ -63,7 +96,9 @@ namespace web_api.Controllers
         }
     }
 
-    /// //////////////////////////////////////////////////////////
+
+    /// ////////////////////////////////////////////////////////////////////////////////////////
+
 
     [Route("api/[controller]")]
     public class InventoryController : Controller
@@ -147,19 +182,22 @@ namespace web_api.Controllers
 
         // Used For adding a single inventory item:
         [HttpPost]
-        public IActionResult Post(string values)
+        public IActionResult Post(InventoryItemPostRecieve model)
         {
-            if (!string.IsNullOrEmpty(values))
+            System.Diagnostics.Debug.WriteLine("########## POST: " + model);
+            Console.WriteLine("########## POST: " + model);
+
+            if (model != null)
             {
                 try
                 {
-                    InventoryItem item = new InventoryItem(values);
                     itemTableLock.WaitOne();
+                    InventoryItem item = new InventoryItem(itemTable.Count + 1, model.Name, model.Description, model.Barcode, model.PurchasePrice, model.RetailPrice, model.Quantity);
                     itemTable.Add(item);
                     itemTableLock.ReleaseMutex();
 
-                    System.Diagnostics.Debug.WriteLine("########## POST: " + values);
-                    Console.WriteLine("########## POST: " + values);
+                    System.Diagnostics.Debug.WriteLine("########## POST: " + item);
+                    Console.WriteLine("########## POST: " + item);
 
                     // NOTE(Xavier): This is probably not the best idea
                     // because it will be called for each request.
@@ -167,7 +205,7 @@ namespace web_api.Controllers
                     var file = new StreamWriter(inventoryDatabaseFile);
                     foreach (var entry in itemTable)
                     {
-                        file.WriteLine(entry.ToString());
+                        file.WriteLine(entry);
                     }
                     file.Close();
                     itemTableLock.ReleaseMutex();
