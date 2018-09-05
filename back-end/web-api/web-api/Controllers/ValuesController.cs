@@ -9,6 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace web_api.Controllers
 {
+    /// ////////////////////////////////////////////////////////////////////////////////
+    /// ////////////////////////////////////////////////////////////////////////////////
+    /// INVENTORY:
+    /// ////////////////////////////////////////////////////////////////////////////////
+    /// ////////////////////////////////////////////////////////////////////////////////
+
     public class InventoryItemPostRecieve
     {
         [Key]
@@ -46,15 +52,15 @@ namespace web_api.Controllers
         public string retailPrice;
         public int quantity;
 
-        public InventoryItem(int _id, string _name, string _description, string _barcode, string _purchasePrice, string _retailPrice, int _quantity)
+        public InventoryItem(int id, string name, string description, string barcode, string purchasePrice, string retailPrice, int quantity)
         {
-            id = _id;
-            name = _name;
-            description = _description;
-            barcode = _barcode;
-            purchasePrice = _purchasePrice;
-            retailPrice = _retailPrice;
-            quantity = _quantity;
+            this.id = id;
+            this.name = name;
+            this.description = description;
+            this.barcode = barcode;
+            this.purchasePrice = purchasePrice;
+            this.retailPrice = retailPrice;
+            this.quantity = quantity;
         }
 
         // FIXME(Xavier): There is more to concider here...
@@ -69,19 +75,17 @@ namespace web_api.Controllers
             try
             {
                 string[] values = input.Split(',');
-                if (values.Length == 7 && Int32.TryParse(values[0], out id) && Int32.TryParse(values[6], out quantity))
+                if (values.Length == 7 && Int32.TryParse(values[0], out this.id) && Int32.TryParse(values[6], out this.quantity))
                 {
-                    name = values[1];
-                    description = values[2];
-                    barcode = values[3];
-                    purchasePrice = values[4];
-                    retailPrice = values[5];
+                    this.name = values[1];
+                    this.description = values[2];
+                    this.barcode = values[3];
+                    this.purchasePrice = values[4];
+                    this.retailPrice = values[5];
                 }
                 else
                 {
-                    // NOTE(Xavier): How should be handle this??
-                    // For now I guess we can just go with throwing an exception for now:
-                    throw new Exception(); // I dont think it matters what type of exception, only the fact that one is thrown.
+                    throw new Exception();
                 }
             }
             catch (Exception)
@@ -92,22 +96,17 @@ namespace web_api.Controllers
 
         public override string ToString()
         {
-            string result = id.ToString() + "," + name.Replace(",", "") + "," + description.Replace(",", "") + "," + barcode.Replace(",", "") + "," + purchasePrice.Replace(",", "") + "," + retailPrice.Replace(",", "") + "," + quantity;
-            return result;
+            return this.id.ToString() + "," + this.name.Replace(",", "") + "," + this.description.Replace(",", "") + "," + this.barcode.Replace(",", "") + "," + this.purchasePrice.Replace(",", "") + "," + this.retailPrice.Replace(",", "") + "," + this.quantity.ToString();
         }
     }
-
-
-    /// ////////////////////////////////////////////////////////////////////////////////////////
-
 
     [Route("api/[controller]")]
     public class InventoryController : Controller
     {
-        private static List<InventoryItem> itemTable = new List<InventoryItem>();
-        private static bool itemTableLoadedFromFile = false;
-        private static Mutex itemTableLock = new Mutex();
         private static string inventoryDatabaseFile;
+        private static Mutex itemTableLock = new Mutex();
+        private static bool itemTableLoadedFromFile = false;
+        private static List<InventoryItem> itemTable = new List<InventoryItem>();
 
         public InventoryController() : base()
         {
@@ -142,52 +141,50 @@ namespace web_api.Controllers
                     file.Close();
                 }
 
-                System.Diagnostics.Debug.WriteLine("########## PATH: " + inventoryDatabaseFile);
-                Console.WriteLine("########## PATH: " + inventoryDatabaseFile);
+                System.Diagnostics.Debug.WriteLine("########## INVENTORY PATH: " + inventoryDatabaseFile);
+                Console.WriteLine("########## INVENTORY PATH: " + inventoryDatabaseFile);
             }
         }
 
         // Used for getting all inventory items:
-        //[HttpGet]
-        //public IEnumerable<string> Get()
-        //{
-        //    System.Diagnostics.Debug.WriteLine("########## GET Inventory");
-        //    Console.WriteLine("########## GET Inventory");
+        [HttpGet]
+        public IEnumerable<string> Get()
+        {
+            System.Diagnostics.Debug.WriteLine("########## GET Inventory");
+            Console.WriteLine("########## GET Inventory");
 
-        //    List<string> result = new List<string>();
-        //    foreach (var entry in itemTable)
-        //    {
-        //        result.Add(entry.ToString());
-        //    }
+            List<string> result = new List<string>();
+            foreach (var entry in itemTable)
+            {
+                result.Add(entry.ToString());
+            }
 
-        //    return result;
-        //}
+            return result;
+        }
 
-        //// Used for getting a single inventory item:
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    System.Diagnostics.Debug.WriteLine("########## GET ID Inventory");
-        //    Console.WriteLine("########## GET ID Inventory");
+        // Used for getting a single inventory item:
+        [HttpGet("{id}")]
+        public string Get(int id)
+        {
+            System.Diagnostics.Debug.WriteLine("########## GET ID Inventory");
+            Console.WriteLine("########## GET ID Inventory");
 
-        //    List<string> result = new List<string>();
-        //    foreach (var entry in itemTable)
-        //    {
-        //        if (entry.id == id)
-        //        {
-        //            return entry.ToString();
-        //        }
-        //    }
-        //    return ""; // NOTE(Xavier): maybe this should be an error code instead of an empty string.
-        //}
+            List<string> result = new List<string>();
+            foreach (var entry in itemTable)
+            {
+                if (entry.id == id)
+                {
+                    return entry.ToString();
+                }
+            }
+
+            return ""; // NOTE(Xavier): maybe this should be an error code instead of an empty string.
+        }
 
         // Used For adding a single inventory item:
         [HttpPost]
         public IActionResult Post(InventoryItemPostRecieve model)
         {
-            System.Diagnostics.Debug.WriteLine("########## POST: " + model);
-            Console.WriteLine("########## POST: " + model);
-
             if (model != null)
             {
                 try
@@ -197,11 +194,11 @@ namespace web_api.Controllers
                     itemTable.Add(item);
                     itemTableLock.ReleaseMutex();
 
-                    System.Diagnostics.Debug.WriteLine("########## POST: " + item);
-                    Console.WriteLine("########## POST: " + item);
+                    System.Diagnostics.Debug.WriteLine("########## INVENTORY POST: " + model);
+                    Console.WriteLine("########## INVENTORY POST: " + model);
 
-                    // NOTE(Xavier): This is probably not the best idea
-                    // because it will be called for each request.
+                    // NOTE(Xavier): It is probably not the best idea to do this
+                    // here because it will be called for each request.
                     itemTableLock.WaitOne();
                     var file = new StreamWriter(inventoryDatabaseFile);
                     foreach (var entry in itemTable)
@@ -220,7 +217,8 @@ namespace web_api.Controllers
                     // The Model is incomplete.
                     return StatusCode(403);
                 }
-            } else
+            }
+            else
             {
                 // 400 - Failure
                 return StatusCode(400);
@@ -228,25 +226,229 @@ namespace web_api.Controllers
         }
     }
 
-    // NOTE(Xavier): This will be implemented
-    // when we are at that stage.
-    //[Route("api/[controller]")]
-    //public class SalesController : Controller
-    //{
-    //[HttpGet]
-    //public IEnumerable<string> Get()
-    //{
-    //    System.Diagnostics.Debug.WriteLine("########## GET Sales");
-    //    Console.WriteLine("########## GET Sales");
-    //    return new string[] { "Sale 1", "Sale 2" };
-    //}
+    /// ////////////////////////////////////////////////////////////////////////////////
+    /// ////////////////////////////////////////////////////////////////////////////////
+    /// SALE:
+    /// ////////////////////////////////////////////////////////////////////////////////
+    /// ////////////////////////////////////////////////////////////////////////////////
 
-    //[HttpPost]
-    //public void Post(string values)
-    //{
-    //    System.Diagnostics.Debug.WriteLine("########## POST" + values);
-    //    Console.WriteLine("########## POST" + values);
-    //}
-    //}
+    public class SalePostRecieve
+    {
+        [Key]
+        [Required]
+        public int GroupID { get; set; }
+
+        [Required]
+        public int ItemID { get; set; }
+
+        [Required]
+        public int Quantity { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        public string Date { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        public string Time { get; set; }
+
+        [Required]
+        public int NumberInGroup { get; set; }
+
+        [Required]
+        public bool LastInGroup { get; set; }
+    }
+
+    public class SalePostRecieveGroup
+    {
+        public int groupID;
+        public bool foundEndOfGroup = false;
+        public int groupLength = 0;
+        public List<SalePostRecieve> sales = new List<SalePostRecieve>();
+    }
+
+    public class Sale
+    {
+        public int id;
+        public int groupID;
+        public int itemID;
+        public int quantity;
+        public string date;
+        public string time;
+
+        public Sale(int id, int groupID, int itemID, int quantity, string date, string time)
+        {
+            this.id = id;
+            this.groupID = groupID;
+            this.itemID = itemID;
+            this.quantity = quantity;
+            this.date = date;
+            this.time = time;
+        }
+
+        public Sale(string input)
+        {
+            try
+            {
+                string[] values = input.Split(',');
+                if (values.Length == 6 && Int32.TryParse(values[0], out this.id) && Int32.TryParse(values[1], out this.groupID) && Int32.TryParse(values[2], out this.itemID) && Int32.TryParse(values[3], out this.quantity))
+                {
+                    this.date = values[4];
+                    this.time = values[5];
+                }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public override string ToString()
+        {
+            return this.id.ToString() + "," + this.groupID.ToString() + "," + this.itemID.ToString() + "," + this.quantity.ToString() + "," + this.date.Replace(",", "") + "," + this.time.Replace(",", "");
+        }
+    }
+
+    [Route("api/[controller]")]
+    public class SalesController : Controller
+    {
+        private static string salesDatabaseFile;
+        private static Mutex salesTableLock = new Mutex();
+        private static bool salesTableLoadedFromFile = false;
+        private static List<Sale> salesTable = new List<Sale>();
+
+        private static Mutex processingSalesLock = new Mutex();
+        private static List<SalePostRecieveGroup> processingSales = new List<SalePostRecieveGroup>();
+
+        public SalesController()
+        {
+            if (!salesTableLoadedFromFile)
+            {
+                salesTableLoadedFromFile = true;
+
+                // Get the directory where the database (csv files) are stored:
+                salesDatabaseFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "../../"); // bin folder
+                salesDatabaseFile += "sales.csv";
+
+                // Try and find the database file:
+                if (System.IO.File.Exists(salesDatabaseFile))
+                {
+                    // Load everything into the list:
+                    string line;
+                    var file = new StreamReader(salesDatabaseFile);
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        try
+                        {
+                            Sale sale = new Sale(line);
+                            salesTableLock.WaitOne();
+                            salesTable.Add(sale);
+                            salesTableLock.ReleaseMutex();
+                        }
+                        catch (Exception)
+                        {
+                            // Sale could not be added
+                        }
+                    }
+                    file.Close();
+                }
+
+                System.Diagnostics.Debug.WriteLine("########## SALES PATH: " + salesDatabaseFile);
+                Console.WriteLine("########## SALES PATH: " + salesDatabaseFile);
+            }
+        }
+
+        // Helper Method or the Sale Post Request:
+        private void ProcessPostGroup(SalePostRecieveGroup group, SalePostRecieve model)
+        {
+            group.sales.Add(model);
+            processingSales.Add(group);
+            if (model.LastInGroup)
+            {
+                group.foundEndOfGroup = true;
+                group.groupLength = model.NumberInGroup + 1;
+            }
+
+            if (group.foundEndOfGroup)
+            {
+                // Test to see if all of sales group is present, if so add it ro the list.
+                if (group.sales.Count == group.groupLength)
+                {
+                    System.Diagnostics.Debug.WriteLine("########## SALES GROUP ADDED: " + group);
+                    Console.WriteLine("########## SALES GROUP ADDED: " + group);
+
+                    salesTableLock.WaitOne();
+                    foreach (var item in group.sales)
+                    {
+                        Sale sale = new Sale(salesTable.Count + 1, item.GroupID, item.ItemID, item.Quantity, item.Date, item.Time);
+                        salesTable.Add(sale);
+
+                        // NOTE(Xavier): It is probably not the best idea to do this here
+                        // because it will be called for each complete group to be added.
+                        var file = new StreamWriter(salesDatabaseFile);
+                        foreach (var entry in salesTable)
+                        {
+                            file.WriteLine(entry);
+                        }
+                        file.Close();
+
+                    }
+                    salesTableLock.ReleaseMutex();
+
+                    processingSales.Remove(group);
+                }
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Post(SalePostRecieve model)
+        {
+            if (model != null)
+            {
+                try
+                {
+                    System.Diagnostics.Debug.WriteLine("########## SALES POST: " + model);
+                    Console.WriteLine("########## SALES POST: " + model);
+
+                    processingSalesLock.WaitOne();
+                    bool foundGroup = false;
+                    foreach (var group in processingSales)
+                    {
+                        if (group.groupID == model.GroupID)
+                        {
+                            foundGroup = true;
+                            ProcessPostGroup(group, model);
+                            break;
+                        }
+                    }
+                    if (!foundGroup)
+                    {
+                        SalePostRecieveGroup group = new SalePostRecieveGroup();
+                        group.groupID = model.GroupID;
+                        ProcessPostGroup(group, model);
+                    }
+                    processingSalesLock.ReleaseMutex();
+
+                    // 200 - Success
+                    return StatusCode(200);
+                }
+                catch (Exception)
+                {
+                    // 403 - Forbidden. The request was legal but the server is refusing to respond to it.
+                    // The Model is incomplete.
+                    return StatusCode(403);
+                }
+            }
+            else
+            {
+                // 400 - Failure
+                return StatusCode(400);
+            }
+        }
+    }
 
 }
