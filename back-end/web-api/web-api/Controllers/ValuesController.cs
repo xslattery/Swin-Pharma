@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web_api.Controllers
@@ -24,7 +23,7 @@ namespace web_api.Controllers
 
         [Required]
         [DataType(DataType.Text)]
-        public string Description { get; set; }
+        public string Brand { get; set; }
 
         [Required]
         [DataType(DataType.Text)]
@@ -46,17 +45,17 @@ namespace web_api.Controllers
     {
         public int id;
         public string name;
-        public string description;
+        public string brand;
         public string barcode;
         public string purchasePrice;
         public string retailPrice;
         public int quantity;
 
-        public InventoryItem(int id, string name, string description, string barcode, string purchasePrice, string retailPrice, int quantity)
+        public InventoryItem(int id, string name, string brand, string barcode, string purchasePrice, string retailPrice, int quantity)
         {
             this.id = id;
             this.name = name;
-            this.description = description;
+            this.brand = brand;
             this.barcode = barcode;
             this.purchasePrice = purchasePrice;
             this.retailPrice = retailPrice;
@@ -78,7 +77,7 @@ namespace web_api.Controllers
                 if (values.Length == 7 && Int32.TryParse(values[0], out this.id) && Int32.TryParse(values[6], out this.quantity))
                 {
                     this.name = values[1];
-                    this.description = values[2];
+                    this.brand = values[2];
                     this.barcode = values[3];
                     this.purchasePrice = values[4];
                     this.retailPrice = values[5];
@@ -96,7 +95,7 @@ namespace web_api.Controllers
 
         public override string ToString()
         {
-            return this.id.ToString() + "," + this.name.Replace(",", "") + "," + this.description.Replace(",", "") + "," + this.barcode.Replace(",", "") + "," + this.purchasePrice.Replace(",", "") + "," + this.retailPrice.Replace(",", "") + "," + this.quantity.ToString();
+            return this.id.ToString() + "," + this.name.Replace(",", "") + "," + this.brand.Replace(",", "") + "," + this.barcode.Replace(",", "") + "," + this.purchasePrice.Replace(",", "") + "," + this.retailPrice.Replace(",", "") + "," + this.quantity.ToString();
         }
     }
 
@@ -190,7 +189,7 @@ namespace web_api.Controllers
                 try
                 {
                     itemTableLock.WaitOne();
-                    InventoryItem item = new InventoryItem(itemTable.Count + 1, model.Name, model.Description, model.Barcode, model.PurchasePrice, model.RetailPrice, model.Quantity);
+                    InventoryItem item = new InventoryItem(itemTable.Count + 1, model.Name, model.Brand, model.Barcode, model.PurchasePrice, model.RetailPrice, model.Quantity);
                     itemTable.Add(item);
                     itemTableLock.ReleaseMutex();
 
