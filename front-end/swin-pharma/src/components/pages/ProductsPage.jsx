@@ -17,21 +17,23 @@ import Grid from '@material-ui/core/Grid';
 import { connect } from 'react-redux';
 import appConfig from '../../scripts/config';
 import axios from 'axios';
-import { fetchProducts } from '../actions';
+import { fetchProducts } from '../../actions/index';
+import { bindActionCreators } from '../../../../../../../AppData/Local/Microsoft/TypeScript/2.9/node_modules/redux';
 
 class SalesPage extends Component {
+    componentDidMount() {
+        this.props.fetchProducts();
+    }
     newProduct(e) {
         e.preventDefault();
         var data = new FormData(e.target);
+        var fetchProducts = () => { this.props.fetchProducts() }
         axios({
-            method: 'post',
+            method: 'POST',
             url: appConfig.serverRoot + 'api/Inventory',
-            data: data,
-            config: { headers: { 'Content-Type': 'multipart/form-data' } }
+            data: data
         })
-            .then(function (response) {
-                console.log(response);
-            })
+            .then(fetchProducts)
             .catch(function (error) {
                 console.log(error);
                 alert('An unexpected error occurred while adding a new product.');
@@ -45,7 +47,7 @@ class SalesPage extends Component {
                     Add a new product
                 </ViewHeading>
                 <ViewFrame>
-                    <form onSubmit={this.newProduct} noValidate autoComplete="off" >
+                    <form onSubmit={this.newProduct.bind(this)} noValidate autoComplete="off" >
                         <Grid container spacing={24}>
                             <Grid item md={6} sm={12}>
                                 <TextField
@@ -153,20 +155,19 @@ class SalesPage extends Component {
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        fetchProducts: () => {
-            dispatch(fetchProducts())
-        }
-    }
-}
-
-const mapStateToProps = function (state) {
+const mapStateToProps = state => {
     return {
         products: state.products,
     }
 }
 
+const mapDispatchToProps = dispatch => {
+    return bindActionCreators({
+        fetchProducts: fetchProducts
+    }, dispatch);
+}
+
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
 )(SalesPage);
