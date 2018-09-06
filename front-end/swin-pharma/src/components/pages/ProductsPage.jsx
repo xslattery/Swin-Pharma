@@ -67,7 +67,7 @@ const rows = [
 ];
 
 class SalesPage extends Component {
-    postForm(e) {
+    newProduct(e) {
         e.preventDefault();
         var data = new FormData(e.target);
         axios({
@@ -92,7 +92,7 @@ class SalesPage extends Component {
                     Add a new product
                 </ViewHeading>
                 <ViewFrame>
-                    <form onSubmit={this.postForm} noValidate autoComplete="off" >
+                    <form onSubmit={this.newProduct} noValidate autoComplete="off" >
                         <Grid container spacing={24}>
                             <Grid item md={6} sm={12}>
                                 <TextField
