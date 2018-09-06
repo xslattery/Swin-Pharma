@@ -60,10 +60,10 @@ class SalesPage extends Component {
                 <ViewFrame>
                     <form onSubmit={this.addSalesRecord} noValidate autoComplete="off" >
                         <Grid container spacing={24}>
-                            <Grid item md={3} sm={12}>
+                            <Grid item md={6} sm={12}>
                                 <TextField
                                     fullWidth
-                                    label="SKU"
+                                    label="Product"
                                     name="Barcode"
                                     pattern="[a-zA-Z \-_\\!\#\$\(\)]"
                                 />
@@ -94,7 +94,7 @@ class SalesPage extends Component {
                                     color="primary"
                                 >
                                     <AddIcon className="left-icon icon-small" />
-                                    Add
+                                    Add Line
                                 </Button>
                             </Grid>
                         </Grid>

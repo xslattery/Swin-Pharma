@@ -17,54 +17,7 @@ import Grid from '@material-ui/core/Grid';
 import { connect } from 'react-redux';
 import appConfig from '../../scripts/config';
 import axios from 'axios';
-
-const rows = [
-    {
-        productCode: 'P123456',
-        name: 'Nature\'s Way Kids Smart Vita Gummies Multi Vitamin & Vegies 60 Gummies',
-        description: 'To help support healthy growth & development.  Berry flavour pastille.',
-        sku: 'P123456',
-        cost: 2.49,
-        price: 7.49,
-        stockLevel: 12
-    },
-    {
-        productCode: 'P123457',
-        name: 'Healthy Care Propolis Toothpaste 120g',
-        description: 'Healthy Care Propolis Toothpaste is an unique toothpaste containing Propolis. It not only protects your teeth from decay but it also promotes healthy gums and fresh breath. It builds a protective barrier against teeth sensitivity due to heat, cold, acids, sweets and brushing.',
-        sku: 'P123456',
-        cost: 1.20,
-        price: 2.49,
-        stockLevel: 19
-    },
-    {
-        productCode: 'P123458',
-        name: 'Healthy Care Lecithin 1200mg 100',
-        description: 'To help support healthy growth & development.  Berry flavour pastille.',
-        sku: 'P123456',
-        cost: 1.99,
-        price: 6.49,
-        stockLevel: 4
-    },
-    {
-        productCode: 'P123459',
-        name: 'A2 Milk Powder Full Cream 1kg',
-        description: '',
-        sku: 'P123456',
-        cost: 4.19,
-        price: 13.49,
-        stockLevel: 12
-    },
-    {
-        productCode: 'P123461',
-        name: 'Healthy Care CoEnzyme Q10 150mg 100 Capsules',
-        description: 'Supports heart health. Supports production of energy in muscles. Maintains healthy heart tissue.',
-        sku: 'P123456',
-        cost: 8.10,
-        price: 21.44,
-        stockLevel: 9
-    },
-];
+import { fetchProducts } from '../actions';
 
 class SalesPage extends Component {
     newProduct(e) {
@@ -97,8 +50,8 @@ class SalesPage extends Component {
                             <Grid item md={6} sm={12}>
                                 <TextField
                                     fullWidth
-                                    label="Product Name"
-                                    name="Name"
+                                    label="Brand"
+                                    name="Brand"
                                     pattern="[a-zA-Z \-_\\!\#\$\(\)]"
                                 />
                             </Grid>
@@ -107,8 +60,8 @@ class SalesPage extends Component {
                                     fullWidth
                                     multiline
                                     rowsMax="4"
-                                    name="Description"
-                                    label="Description"
+                                    name="Name"
+                                    label="Name"
                                 />
                             </Grid>
                             <Grid item md={3} sm={12}>
@@ -169,8 +122,8 @@ class SalesPage extends Component {
                         <TableHead>
                             <TableRow>
                                 <TableCell>Product Code</TableCell>
+                                <TableCell>Brand</TableCell>
                                 <TableCell>Name</TableCell>
-                                <TableCell>Description</TableCell>
                                 <TableCell>SKU</TableCell>
                                 <TableCell>Cost</TableCell>
                                 <TableCell>Price</TableCell>
@@ -178,16 +131,17 @@ class SalesPage extends Component {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows.map(row => {
+                            {this.props.products.index.map(productCode => {
+                                var thisProduct = this.props.products.data[productCode];
                                 return (
-                                    <TableRow key={row.productCode}>
-                                        <TableCell>{row.productCode}</TableCell>
-                                        <TableCell>{row.name}</TableCell>
-                                        <TableCell>{row.description}</TableCell>
-                                        <TableCell>{row.sku}</TableCell>
-                                        <TableCell>{row.cost}</TableCell>
-                                        <TableCell>{row.price}</TableCell>
-                                        <TableCell>{row.stockLevel}</TableCell>
+                                    <TableRow key={productCode}>
+                                        <TableCell>{productCode}</TableCell>
+                                        <TableCell>{thisProduct.brand}</TableCell>
+                                        <TableCell>{thisProduct.name}</TableCell>
+                                        <TableCell>{thisProduct.sku}</TableCell>
+                                        <TableCell>{thisProduct.cost}</TableCell>
+                                        <TableCell>{thisProduct.price}</TableCell>
+                                        <TableCell>{thisProduct.stockLevel}</TableCell>
                                     </TableRow>
                                 );
                             })}
@@ -199,9 +153,17 @@ class SalesPage extends Component {
     }
 }
 
+const mapDispatchToProps = dispatch => {
+    return {
+        fetchProducts: () => {
+            dispatch(fetchProducts())
+        }
+    }
+}
+
 const mapStateToProps = function (state) {
     return {
-        test: state.test,
+        products: state.products,
     }
 }
 
