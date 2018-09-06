@@ -28,7 +28,6 @@ export const fetchProducts = () => {
                 }
                 products.index[i] = columns[0];
             }
-            console.log(products);
             dispatch(updateProducts(products));
         });
     }
