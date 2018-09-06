@@ -321,6 +321,9 @@ namespace web_api.Controllers
         private static bool salesTableLoadedFromFile = false;
         private static List<Sale> salesTable = new List<Sale>();
 
+        public static int nextGroup;
+        private static Mutex nextGroupLock = new Mutex();
+
         private static Mutex processingSalesLock = new Mutex();
         private static List<SalePostRecieveGroup> processingSales = new List<SalePostRecieveGroup>();
 
@@ -347,11 +350,19 @@ namespace web_api.Controllers
                             Sale sale = new Sale(line);
                             salesTableLock.WaitOne();
                             salesTable.Add(sale);
+
+                            nextGroupLock.WaitOne();
+                            if (sale.groupID > nextGroup)
+                                nextGroup = sale.groupID + 1;
+                            nextGroupLock.ReleaseMutex();
+
                             salesTableLock.ReleaseMutex();
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
                             // Sale could not be added
+                            System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                            Console.WriteLine(e.StackTrace);
                         }
                     }
                     file.Close();
@@ -448,6 +459,18 @@ namespace web_api.Controllers
                 // 400 - Failure
                 return StatusCode(400);
             }
+        }
+
+        // Used for getting a single inventory item:
+        [Route("Group/")]
+        [HttpGet]
+        public int Get()
+        {
+            nextGroupLock.WaitOne();
+            int result = nextGroup++;
+            nextGroupLock.ReleaseMutex();
+
+            return result;
         }
     }
 
