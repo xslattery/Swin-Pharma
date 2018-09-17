@@ -255,8 +255,54 @@ namespace web_api.Controllers
 
             // If the item does not exist return a not found.
             if (!foundItem) return NotFound();
-
             return Ok();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, InventoryItemPostRecieve model) {
+            System.Diagnostics.Debug.WriteLine("########## PUT Inventory " + id.ToString());
+            Console.WriteLine("########## PUT Inventory " + id.ToString());
+
+            if (model != null) {
+                try {
+                    InventoryItem item = new InventoryItem(
+                        id,
+                        model.Name, 
+                        model.Brand, 
+                        model.Barcode, 
+                        model.PurchasePrice, 
+                        model.RetailPrice, 
+                        model.Quantity);
+                    
+                    bool foundItem = false;
+                    itemTableLock.WaitOne();
+
+                    // Check to see if the item exists
+                    foreach (InventoryItem line in itemTable) {
+                        // If item is found, replace with updated data
+                        if (line.id == id) {
+                            // ############# Help
+                            break;
+                        }
+                    }
+
+                    // Save File
+                    var file = new StreamWriter(inventoryDatabaseFile);
+                    foreach (var entry in itemTable)
+                    {
+                        file.WriteLine(entry);
+                    }
+                    file.Close();
+                    itemTableLock.ReleaseMutex();
+
+                    // If the item does not exist return a not found.
+                    if (!foundItem) return NotFound();
+                    return Ok();
+                } catch (Exception e) {
+                    // Internal Error
+                    return StatusCode(500);
+                }
+            }
         }
     }
 
