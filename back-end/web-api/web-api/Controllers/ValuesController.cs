@@ -321,7 +321,7 @@ namespace web_api.Controllers
         private static List<Sale> salesTable = new List<Sale>();
 
         public static int nextGroup;
-        private static Mutex nextGroupLock = new Mutex();
+        public static Mutex nextGroupLock = new Mutex();
 
         private static Mutex processingSalesLock = new Mutex();
         private static List<SalePostRecieveGroup> processingSales = new List<SalePostRecieveGroup>();
@@ -460,21 +460,6 @@ namespace web_api.Controllers
             }
         }
 
-        // NOTE(Xavier): In relation to a comment below
-        // this method should probably be moved to avoid the conflict.
-        //
-        // Used for getting a single inventory item:
-        [Route("Group/")]
-        [HttpGet]
-        public int Get()
-        {
-            nextGroupLock.WaitOne();
-            int result = nextGroup++;
-            nextGroupLock.ReleaseMutex();
-
-            return result;
-        }
-
         // Used for getting a single sales group:
         [HttpGet("{id}")]
         public IEnumerable<string> Get(int id)
@@ -493,29 +478,54 @@ namespace web_api.Controllers
 
             // NOTE(Xavier): We need to handle if the group does not exist.
 
-            return result; 
+            return result;
         }
 
-        // NOTE(Xavier): This currently conflicts with our other Get() method in this class
-        // so wher are probably going to need to move one of them.
-        //
         // Used for getting all sales items:
-        //[HttpGet]
-        //public IEnumerable<string> Get()
-        //{
-        //    System.Diagnostics.Debug.WriteLine("########## GET Sales");
-        //    Console.WriteLine("########## GET Sales");
+        [HttpGet]
+        public IEnumerable<string> Get()
+        {
+            System.Diagnostics.Debug.WriteLine("########## GET Sales");
+            Console.WriteLine("########## GET Sales");
 
-        //    salesTableLock.WaitOne();
-        //    List<string> result = new List<string>();
-        //    foreach (var entry in salesTable)
-        //    {
-        //        result.Add(entry.ToString());
-        //    }
-        //    salesTableLock.ReleaseMutex();
+            salesTableLock.WaitOne();
+            List<string> result = new List<string>();
+            foreach (var entry in salesTable)
+            {
+                result.Add(entry.ToString());
+            }
+            salesTableLock.ReleaseMutex();
 
-        //    return result;
-        //}
+            return result;
+        }
+    }
+
+    // This is a helper class to mamnage getting unique group
+    // id's for new sales that are being added:
+    [Route("api/[controller]")]
+    public class GroupController : Controller
+    {
+        static bool loadSalesOnce_hack = false;
+
+        [HttpGet]
+        public int Get()
+        {
+            // This is done to fix the isue where the sales may
+            // not be loaded before a group get is made.
+            if (!loadSalesOnce_hack) {
+                loadSalesOnce_hack = true;
+                SalesController sc = new SalesController();
+            }
+
+            System.Diagnostics.Debug.WriteLine("########## GROUP GET: ");
+            Console.WriteLine("########## GROUP GET: ");
+
+            SalesController.nextGroupLock.WaitOne();
+            int result = SalesController.nextGroup++;
+            SalesController.nextGroupLock.ReleaseMutex();
+
+            return result;
+        }
     }
 
 }
