@@ -6,7 +6,7 @@ import theme from '../scripts/muiTheme';
 import MainLayout from './global/MainLayout.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { fetchProducts } from '../actions/index';
+import { fetchProducts, fetchSales } from '../actions/index';
 import { bindActionCreators } from 'redux';
 
 class App extends Component {
@@ -25,6 +25,7 @@ class App extends Component {
   }
   sync() {
     this.props.fetchProducts();
+    this.props.fetchSales();
   }
   render() {
     return (
@@ -42,7 +43,8 @@ class App extends Component {
 
 const mapDispatchToProps = dispatch => {
   return bindActionCreators({
-    fetchProducts: fetchProducts
+    fetchProducts,
+    fetchSales
   }, dispatch);
 }
 

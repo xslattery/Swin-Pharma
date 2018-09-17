@@ -87,8 +87,10 @@ class SalesRecordBuilder extends Component {
                     number_in_group: i,
                     last_in_group: i == this.state.rows.length - 1 ? true : false
                 }).then((res) => {
-
-                })
+                    console.log(res);
+                }).catch((err) => {
+                    console.log(err);
+                });
             }
         });
     }

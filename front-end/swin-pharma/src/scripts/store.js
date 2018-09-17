@@ -57,7 +57,10 @@ export default () => {
                 // 'P123456', 'P123457', 'P123458', 'P123459', 'P123461'
             ]
         },
-
+        sales: {
+            data: {},
+            index: []
+        }
     };
     return createStore(
         rootReducer,
