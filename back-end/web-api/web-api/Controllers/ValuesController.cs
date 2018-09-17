@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace web_api.Controllers
@@ -99,6 +100,7 @@ namespace web_api.Controllers
         }
     }
 
+    [EnableCors("SiteCorsPolicy")]
     [Route("api/[controller]")]
     public class InventoryController : Controller
     {
@@ -402,6 +404,7 @@ namespace web_api.Controllers
         }
     }
 
+    [EnableCors("SiteCorsPolicy")]
     [Route("api/[controller]")]
     public class SalesController : Controller
     {
@@ -601,6 +604,7 @@ namespace web_api.Controllers
 
     // This is a helper class to mamnage getting unique group
     // id's for new sales that are being added:
+    [EnableCors("SiteCorsPolicy")]
     [Route("api/[controller]")]
     public class GroupController : Controller
     {
