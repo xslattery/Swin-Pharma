@@ -460,6 +460,9 @@ namespace web_api.Controllers
             }
         }
 
+        // NOTE(Xavier): In relation to a comment below
+        // this method should probably be moved to avoid the conflict.
+        //
         // Used for getting a single inventory item:
         [Route("Group/")]
         [HttpGet]
@@ -471,6 +474,48 @@ namespace web_api.Controllers
 
             return result;
         }
+
+        // Used for getting a single sales group:
+        [HttpGet("{id}")]
+        public IEnumerable<string> Get(int id)
+        {
+            System.Diagnostics.Debug.WriteLine("########## GET ID Sale");
+            Console.WriteLine("########## GET ID Sale");
+
+            List<string> result = new List<string>();
+            foreach (var entry in salesTable)
+            {
+                if (entry.groupID == id)
+                {
+                    result.Add(entry.ToString());
+                }
+            }
+
+            // NOTE(Xavier): We need to handle if the group does not exist.
+
+            return result; 
+        }
+
+        // NOTE(Xavier): This currently conflicts with our other Get() method in this class
+        // so wher are probably going to need to move one of them.
+        //
+        // Used for getting all sales items:
+        //[HttpGet]
+        //public IEnumerable<string> Get()
+        //{
+        //    System.Diagnostics.Debug.WriteLine("########## GET Sales");
+        //    Console.WriteLine("########## GET Sales");
+
+        //    salesTableLock.WaitOne();
+        //    List<string> result = new List<string>();
+        //    foreach (var entry in salesTable)
+        //    {
+        //        result.Add(entry.ToString());
+        //    }
+        //    salesTableLock.ReleaseMutex();
+
+        //    return result;
+        //}
     }
 
 }
