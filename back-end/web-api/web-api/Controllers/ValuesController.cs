@@ -223,6 +223,31 @@ namespace web_api.Controllers
                 return StatusCode(400);
             }
         }
+    
+        // Used to delete a single inventory item:
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id) {
+            // Find the item,
+            // Delete the item
+
+            // Errors to handle
+                // if there are values in the HTTP Header or Body
+
+            System.Diagnostics.Debug.WriteLine("########## DELETE ID Inventory " + id.ToString());
+            Console.WriteLine("########## DELETE ID Inventory " + id.ToString());
+
+            // Check to see if we can find the item
+            // Print item
+            /*
+            using (var reader = new StreamReader(inventoryDatabaseFile)) {
+                while (!reader.EndOfStream) {
+                     System.Diagnostics.Debug.WriteLine(reader.ReadLine());
+                     Console.WriteLine(reader.ReadLine());
+                }
+            }
+             */
+            return NoContent();
+        }
     }
 
     /// ////////////////////////////////////////////////////////////////////////////////
