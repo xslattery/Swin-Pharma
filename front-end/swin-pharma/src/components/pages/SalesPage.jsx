@@ -62,7 +62,7 @@ class SalesPage extends Component {
                                 var thisRow = this.props.sales.data[saleId];
                                 return (
                                     <TableRow key={saleId}>
-                                        <TableCell component="th" scope="row">{thisRow.group_id}</TableCell>
+                                        <TableCell component="th" scope="row" numeric>{thisRow.group_id}</TableCell>
                                         <TableCell numeric>{this.props.products.data[thisRow.item_id].name}</TableCell>
                                         <TableCell numeric>{thisRow.quantity}</TableCell>
                                         <TableCell numeric>{thisRow.date}</TableCell>

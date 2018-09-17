@@ -19,6 +19,7 @@ import appConfig from '../../scripts/config';
 import axios from 'axios';
 import { fetchProducts } from '../../actions/index';
 import { bindActionCreators } from 'redux';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 class ProductsPage extends Component {
     componentDidMount() {
@@ -135,6 +136,7 @@ class ProductsPage extends Component {
                                 <TableCell>Cost</TableCell>
                                 <TableCell>Price</TableCell>
                                 <TableCell>Stock Level</TableCell>
+                                <TableCell>Delete</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -149,6 +151,21 @@ class ProductsPage extends Component {
                                         <TableCell>{thisProduct.cost}</TableCell>
                                         <TableCell>{thisProduct.price}</TableCell>
                                         <TableCell>{thisProduct.stockLevel}</TableCell>
+                                        <TableCell>
+                                            <Button
+                                                size="small"
+                                                onClick={((productCode) => {
+                                                    return () => {
+                                                        axios.delete('api/Inventory/' + productCode)
+                                                            .then((res) => {
+                                                                console.log(res);
+                                                            });
+                                                    }
+                                                })(productCode)}
+                                            >
+                                                <DeleteIcon />
+                                            </Button>
+                                        </TableCell>
                                     </TableRow>
                                 );
                             })}

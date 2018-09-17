@@ -14,9 +14,11 @@ import DoneIcon from '@material-ui/icons/Done';
 import ProductSearch from '../etc/ProductSearch.jsx';
 import appConfig from '../../scripts/config';
 import { connect } from 'react-redux';
+import { fetchSales } from '../../actions/index';
 import axios from 'axios';
 import DeleteIcon from '@material-ui/icons/Delete';
 import zeroFill from '../../scripts/zeroFill';
+import { bindActionCreators } from 'redux';
 
 class SalesRecordBuilder extends Component {
     constructor(props) {
@@ -77,20 +79,26 @@ class SalesRecordBuilder extends Component {
             var salesRecordTime = zeroFill(currentdate.getHours(), 2) + ':' + zeroFill(currentdate.getMinutes(), 2);
 
             for (var i = 0; i < this.state.rows.length; i++) {
-                var thisRow = this.state.rows[i];
-                axios.post(appConfig.serverRoot + 'api/Sales', {
-                    group_id: salesRecordId,
-                    item_id: thisRow.item_id,
-                    date: salesRecordDate,
-                    time: salesRecordTime,
-                    quantity: thisRow.quantity,
-                    number_in_group: i,
-                    last_in_group: i == this.state.rows.length - 1 ? true : false
-                }).then((res) => {
-                    console.log(res);
-                }).catch((err) => {
-                    console.log(err);
-                });
+                (() => {
+                    var thisRow = this.state.rows[i];
+                    var isLast = i == this.state.rows.length - 1;
+                    axios.post(appConfig.serverRoot + 'api/Sales', {
+                        group_id: salesRecordId,
+                        item_id: thisRow.item_id,
+                        date: salesRecordDate,
+                        time: salesRecordTime,
+                        quantity: thisRow.quantity,
+                        number_in_group: i,
+                        last_in_group: i == this.state.rows.length - 1 ? true : false
+                    }).then((res) => {
+                        if (isLast) {
+                            this.props.fetchSales();
+                        }
+                        console.log(res);
+                    }).catch((err) => {
+                        console.log(err);
+                    });
+                })();
             }
         });
     }
@@ -207,6 +215,13 @@ const mapStateToProps = state => {
     }
 }
 
+const mapDispatchToProps = dispatch => {
+    return bindActionCreators({
+        fetchSales
+    }, dispatch);
+}
+
 export default connect(
-    mapStateToProps
-)(SalesRecordBuilder);
+    mapStateToProps,
+    mapDispatchToProps
+)(SalesRecordBuilder);  
