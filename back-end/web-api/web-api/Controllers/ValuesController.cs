@@ -230,22 +230,33 @@ namespace web_api.Controllers
         // Used to delete a single inventory item:
         [HttpDelete("{id}")]
         public IActionResult Delete(int id) {
-            // Errors to handle
-                // if there are values in the HTTP Header or Body
 
             System.Diagnostics.Debug.WriteLine("########## DELETE ID Inventory " + id.ToString());
             Console.WriteLine("########## DELETE ID Inventory " + id.ToString());
 
-            // Check to see if we can find the item
-            // Print item
+            // Remove the item if it exists
+            bool foundItem = false;
             itemTableLock.WaitOne();
             foreach (InventoryItem line in itemTable) {
-                if (line.id == id)
+                if (line.id == id) {
+                    foundItem = true;
                     itemTable.Remove(line);
+                    break;
+                }
             }
+
+            var file = new StreamWriter(inventoryDatabaseFile);
+            foreach (var entry in itemTable)
+            {
+                file.WriteLine(entry);
+            }
+            file.Close();
             itemTableLock.ReleaseMutex();
 
-            return NoContent();
+            // If the item does not exist return a not found.
+            if (!foundItem) return NotFound();
+
+            return Ok();
         }
     }
 
