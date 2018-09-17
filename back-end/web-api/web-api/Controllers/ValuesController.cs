@@ -238,14 +238,15 @@ namespace web_api.Controllers
 
             // Check to see if we can find the item
             // Print item
-            /*
+            
             using (var reader = new StreamReader(inventoryDatabaseFile)) {
+                reader.DiscardBufferedData();
                 while (!reader.EndOfStream) {
                      System.Diagnostics.Debug.WriteLine(reader.ReadLine());
                      Console.WriteLine(reader.ReadLine());
                 }
             }
-             */
+            
             return NoContent();
         }
     }
