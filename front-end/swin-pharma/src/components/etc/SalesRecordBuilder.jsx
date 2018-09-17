@@ -11,8 +11,12 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import AddIcon from '@material-ui/icons/Add';
 import DoneIcon from '@material-ui/icons/Done';
-import { connect } from 'react-redux';
 import ProductSearch from '../etc/ProductSearch.jsx';
+import appConfig from '../../scripts/config';
+import { connect } from 'react-redux';
+import axios from 'axios';
+import DeleteIcon from '@material-ui/icons/Delete';
+import zeroFill from '../../scripts/zeroFill';
 
 class SalesRecordBuilder extends Component {
     constructor(props) {
@@ -22,6 +26,23 @@ class SalesRecordBuilder extends Component {
         };
         this.productSearch = createRef();
     }
+    removeSalesRecordLine(itemId) {
+        this.setState({
+            rows: [
+                ...this.state.rows.filter((r) => { return r.item_id !== itemId; })
+            ]
+        });
+    }
+    rowWithIdExists(target) {
+        var found = false;
+        for (var i = 0; i < this.state.rows.length; i++) {
+            if (this.state.rows[i].item_id == target) {
+                found = true;
+                break;
+            }
+        }
+        return found;
+    }
     addSalesRecordLine(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -29,14 +50,47 @@ class SalesRecordBuilder extends Component {
         for (const [key, value] of formData.entries()) {
             jsonObject[key] = value;
         }
-        this.setState({
-            rows: [
-                ...this.state.rows,
-                { 'item_id': jsonObject['item_id'], 'quantity': jsonObject['quantity'] }
-            ]
+        if (jsonObject.quantity < 1) {
+            // invalid
+            alert('Invalid line!');
+        } else if (this.rowWithIdExists(jsonObject.item_id)) {
+            // line already exists for this item
+            alert('You have already listed this item in the current sale!');
+        } else {
+            this.setState({
+                rows: [
+                    ...this.state.rows,
+                    { 'item_id': jsonObject.item_id, 'quantity': jsonObject.quantity }
+                ]
+            });
+
+            //this.productSearch.current.reset();
+            e.target.reset();
+        }
+    }
+    submitSalesRecord(e) {
+        e.preventDefault();
+        axios.get(appConfig.serverRoot + 'api/group').then((res) => {
+            var salesRecordId = res.data;
+            var currentdate = new Date();
+            var salesRecordDate = currentdate.getDate() + "/" + currentdate.getMonth() + "/" + currentdate.getYear();
+            var salesRecordTime = zeroFill(currentdate.getHours(), 2) + ':' + zeroFill(currentdate.getMinutes(), 2);
+
+            for (var i = 0; i < this.state.rows.length; i++) {
+                var thisRow = this.state.rows[i];
+                axios.post(appConfig.serverRoot + 'api/Sales', {
+                    group_id: salesRecordId,
+                    item_id: thisRow.item_id,
+                    date: salesRecordDate,
+                    time: salesRecordTime,
+                    quantity: thisRow.quantity,
+                    number_in_group: i,
+                    last_in_group: i == this.state.rows.length - 1 ? true : false
+                }).then((res) => {
+
+                })
+            }
         });
-        this.productSearch.current.reset();
-        e.target.reset();
     }
     table() {
         if (this.state.rows.length) {
@@ -46,6 +100,7 @@ class SalesRecordBuilder extends Component {
                         <TableRow>
                             <TableCell>Product Name</TableCell>
                             <TableCell numeric>Quantity</TableCell>
+                            <TableCell numeric>Delete</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -56,6 +111,16 @@ class SalesRecordBuilder extends Component {
                                         {this.props.products.data[row['item_id']].name}
                                     </TableCell>
                                     <TableCell numeric>{row['quantity']}</TableCell>
+                                    <TableCell numeric>
+                                        <Button
+                                            onClick={((itemId) => {
+                                                return () => this.removeSalesRecordLine(itemId);
+                                            })(row['item_id'])}
+                                            size="small"
+                                        >
+                                            <DeleteIcon />
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
                             );
                         })}
@@ -115,11 +180,11 @@ class SalesRecordBuilder extends Component {
                                     </Button>
                                     <span style={{ width: '1rem', display: 'inline-block' }}></span>
                                     <Button
-                                        type="submit"
                                         variant="contained"
                                         size="small"
                                         color="primary"
-                                        disabled={(this.state.rows.length && this.productSearch.value === "") ? false : true}
+                                        onClick={this.submitSalesRecord.bind(this)}
+                                        disabled={(this.state.rows.length === 0 && this.productSearch.value !== "") ? true : false}
                                     >
                                         <DoneIcon className="left-icon icon-small" />
                                         Complete
