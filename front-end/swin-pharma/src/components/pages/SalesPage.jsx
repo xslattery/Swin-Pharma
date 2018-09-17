@@ -5,18 +5,11 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import TextField from '@material-ui/core/TextField';
-import Grid from '@material-ui/core/Grid';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
 import ViewHeading from '../global/ViewHeading';
 import { connect } from 'react-redux';
 import appConfig from '../../scripts/config';
 import axios from 'axios';
+import SalesRecordBuilder from '../etc/SalesRecordBuilder';
 
 let id = 0;
 function createData(name, calories, fat, carbs, protein) {
@@ -57,49 +50,7 @@ class SalesPage extends Component {
                 <ViewHeading variant="title">
                     Add a sales record
                 </ViewHeading>
-                <ViewFrame>
-                    <form onSubmit={this.addSalesRecord} noValidate autoComplete="off" >
-                        <Grid container spacing={24}>
-                            <Grid item md={6} sm={12}>
-                                <TextField
-                                    fullWidth
-                                    label="Product"
-                                    name="Barcode"
-                                    pattern="[a-zA-Z \-_\\!\#\$\(\)]"
-                                />
-                            </Grid>
-                            <Grid item md={3} sm={12}>
-                                <FormControl fullWidth>
-                                    <InputLabel htmlFor="s">Selling Price</InputLabel>
-                                    <Input
-                                        startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                        name="Selling Price"
-                                        type="number"
-                                    />
-                                </FormControl>
-                            </Grid>
-                            <Grid item md={3} sm={12}>
-                                <TextField
-                                    fullWidth
-                                    label="Stock Level"
-                                    name="Quantity"
-                                    type="number"
-                                />
-                            </Grid>
-                            <Grid item md={12}>
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    size="small"
-                                    color="primary"
-                                >
-                                    <AddIcon className="left-icon icon-small" />
-                                    Add Line
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </form>
-                </ViewFrame>
+                <SalesRecordBuilder />
                 <ViewHeading variant="title">
                     Recent Sales
                 </ViewHeading>
@@ -136,9 +87,9 @@ class SalesPage extends Component {
     }
 }
 
-const mapStateToProps = function (state) {
+const mapStateToProps = state => {
     return {
-        test: state.test,
+        products: state.products,
     }
 }
 

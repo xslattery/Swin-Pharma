@@ -7,6 +7,9 @@ const composedEnhancers = compose(middlewareEnhancer);
 
 export default () => {
     var initialState = {
+        appState: {
+            activeProcesses: 0
+        },
         products: {
             data: {
                 // 'P123456': {
@@ -59,6 +62,6 @@ export default () => {
     return createStore(
         rootReducer,
         initialState,
-        composedEnhancers,
+        composedEnhancers
     );
 }

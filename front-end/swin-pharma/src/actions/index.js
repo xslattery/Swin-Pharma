@@ -3,13 +3,26 @@ import appConfig from '../scripts/config';
 
 const updateProducts = (products) => {
     return {
-        type: 'FETCH_PRODUCTS',
+        type: 'LOAD_FETCHED_PRODUCTS',
         payload: products
+    }
+}
+
+const addAppProcessToStack = () => {
+    return {
+        type: 'ADD_APP_PROCESS_TO_STACK',
+    }
+}
+
+const removeAppProcessFromStack = () => {
+    return {
+        type: 'REMOVE_APP_PROCESS_FROM_STACK',
     }
 }
 
 export const fetchProducts = () => {
     return (dispatch) => {
+        dispatch(addAppProcessToStack());
         axios.get(appConfig.serverRoot + 'api/inventory').then((res) => {
             var rows = res.data;
             var products = {
@@ -29,6 +42,7 @@ export const fetchProducts = () => {
                 products.index[i] = columns[0];
             }
             dispatch(updateProducts(products));
+            dispatch(removeAppProcessFromStack());
         });
     }
 }
