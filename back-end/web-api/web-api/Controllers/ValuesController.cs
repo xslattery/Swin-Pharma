@@ -108,6 +108,7 @@ namespace web_api.Controllers
         private static Mutex itemTableLock = new Mutex();
         private static bool itemTableLoadedFromFile = false;
         private static List<InventoryItem> itemTable = new List<InventoryItem>();
+        private static int nextItemID = 1;
 
         public InventoryController() : base()
         {
@@ -131,6 +132,8 @@ namespace web_api.Controllers
                         {
                             InventoryItem item = new InventoryItem(line);
                             itemTableLock.WaitOne();
+                            if (item.id > nextItemID)
+                                nextItemID = item.id + 1;
                             itemTable.Add(item);
                             itemTableLock.ReleaseMutex();
                         }
@@ -194,7 +197,7 @@ namespace web_api.Controllers
                 try
                 {
                     itemTableLock.WaitOne();
-                    InventoryItem item = new InventoryItem(itemTable.Count + 1, model.Name, model.Brand, model.Barcode, model.PurchasePrice, model.RetailPrice, model.Quantity);
+                    InventoryItem item = new InventoryItem(nextItemID++, model.Name, model.Brand, model.Barcode, model.PurchasePrice, model.RetailPrice, model.Quantity);
                     itemTable.Add(item);
                     itemTableLock.ReleaseMutex();
 
