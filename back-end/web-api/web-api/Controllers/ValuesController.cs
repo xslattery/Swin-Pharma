@@ -230,9 +230,6 @@ namespace web_api.Controllers
         // Used to delete a single inventory item:
         [HttpDelete("{id}")]
         public IActionResult Delete(int id) {
-            // Find the item,
-            // Delete the item
-
             // Errors to handle
                 // if there are values in the HTTP Header or Body
 
@@ -241,15 +238,13 @@ namespace web_api.Controllers
 
             // Check to see if we can find the item
             // Print item
-            
-            using (var reader = new StreamReader(inventoryDatabaseFile)) {
-                reader.DiscardBufferedData();
-                while (!reader.EndOfStream) {
-                     System.Diagnostics.Debug.WriteLine(reader.ReadLine());
-                     Console.WriteLine(reader.ReadLine());
-                }
+            itemTableLock.WaitOne();
+            foreach (InventoryItem line in itemTable) {
+                if (line.id == id)
+                    itemTable.Remove(line);
             }
-            
+            itemTableLock.ReleaseMutex();
+
             return NoContent();
         }
     }
