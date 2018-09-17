@@ -18,16 +18,21 @@ import { connect } from 'react-redux';
 import appConfig from '../../scripts/config';
 import axios from 'axios';
 import { fetchProducts } from '../../actions/index';
-import { bindActionCreators } from '../../../../../../../AppData/Local/Microsoft/TypeScript/2.9/node_modules/redux';
+import { bindActionCreators } from 'redux';
 
-class SalesPage extends Component {
+class ProductsPage extends Component {
     componentDidMount() {
         this.props.fetchProducts();
     }
     newProduct(e) {
         e.preventDefault();
         var data = new FormData(e.target);
-        var fetchProducts = () => { this.props.fetchProducts() }
+        var fetchProducts = ((form) => {
+            return () => {
+                this.props.fetchProducts()
+                form.reset();
+            }
+        })(e.target);
         axios({
             method: 'POST',
             url: appConfig.serverRoot + 'api/Inventory',
@@ -35,7 +40,7 @@ class SalesPage extends Component {
         })
             .then(fetchProducts)
             .catch(function (error) {
-                console.log(error);
+                alert(error);
                 alert('An unexpected error occurred while adding a new product.');
                 window.location.reload();
             });
@@ -170,4 +175,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(SalesPage);
+)(ProductsPage);

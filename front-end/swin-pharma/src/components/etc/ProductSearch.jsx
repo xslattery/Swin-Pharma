@@ -1,114 +1,245 @@
-// import React from 'react';
-// import PropTypes from 'prop-types';
-// import deburr from 'lodash/deburr';
-// import keycode from 'keycode';
-// import Downshift from 'downshift';
-// import { withStyles } from '@material-ui/core/styles';
-// import TextField from '@material-ui/core/TextField';
-// import Popper from '@material-ui/core/Popper';
-// import Paper from '@material-ui/core/Paper';
-// import MenuItem from '@material-ui/core/MenuItem';
-// import Chip from '@material-ui/core/Chip';
+import React from 'react';
+import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import Select from 'react-select';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
+import Chip from '@material-ui/core/Chip';
+import { connect } from 'react-redux';
+import MenuItem from '@material-ui/core/MenuItem';
+import compose from 'recompose/compose';
+import { emphasize } from '@material-ui/core/styles/colorManipulator';
 
-// function renderInput(inputProps) {
-//     const { InputProps, classes, ref, ...other } = inputProps;
-  
-//     return (
-//       <TextField
-//         InputProps={{
-//           inputRef: ref,
-//           classes: {
-//             root: classes.inputRoot,
-//           },
-//           ...InputProps,
-//         }}
-//         {...other}
-//       />
-//     );
-//   }
+var suggestions;
 
-//   function renderSuggestion({ suggestion, index, itemProps, highlightedIndex, selectedItem }) {
-//     const isHighlighted = highlightedIndex === index;
-//     const isSelected = (selectedItem || '').indexOf(suggestion.label) > -1;
-  
-//     return (
-//       <MenuItem
-//         {...itemProps}
-//         key={suggestion.label}
-//         selected={isHighlighted}
-//         component="div"
-//         style={{
-//           fontWeight: isSelected ? 500 : 400,
-//         }}
-//       >
-//         {suggestion.label}
-//       </MenuItem>
-//     );
-//   }
-//   renderSuggestion.propTypes = {
-//     highlightedIndex: PropTypes.number,
-//     index: PropTypes.number,
-//     itemProps: PropTypes.object,
-//     selectedItem: PropTypes.string,
-//     suggestion: PropTypes.shape({ label: PropTypes.string }).isRequired,
-//   };
+const styles = theme => ({
+    root: {
+        flexGrow: 1,
+        height: 250,
+    },
+    input: {
+        display: 'flex',
+        padding: 0,
+    },
+    valueContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        flex: 1,
+        alignItems: 'center',
+    },
+    chip: {
+        margin: `${theme.spacing.unit / 2}px ${theme.spacing.unit / 4}px`,
+    },
+    chipFocused: {
+        backgroundColor: emphasize(
+            theme.palette.type === 'light' ? theme.palette.grey[300] : theme.palette.grey[700],
+            0.08,
+        ),
+    },
+    noOptionsMessage: {
+        padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
+    },
+    singleValue: {
+        fontSize: 16,
+    },
+    placeholder: {
+        position: 'absolute',
+        left: 2,
+        fontSize: 16,
+    },
+    paper: {
+        position: 'absolute',
+        zIndex: 1,
+        marginTop: theme.spacing.unit,
+        left: 0,
+        right: 0,
+    },
+    divider: {
+        height: theme.spacing.unit * 2,
+    },
+});
 
-//   function getSuggestions(value) {
-//     const inputValue = deburr(value.trim()).toLowerCase();
-//     const inputLength = inputValue.length;
-//     let count = 0;
-  
-//     return inputLength === 0
-//       ? []
-//       : suggestions.filter(suggestion => {
-//           const keep =
-//             count < 5 && suggestion.label.slice(0, inputLength).toLowerCase() === inputValue;
-  
-//           if (keep) {
-//             count += 1;
-//           }
-  
-//           return keep;
-//         });
-//   }
-  
-//   class DownshiftMultiple extends React.Component {
-//     state = {
-//       inputValue: '',
-//       selectedItem: [],
-//     };
-  
-//     handleKeyDown = event => {
-//       const { inputValue, selectedItem } = this.state;
-//       if (selectedItem.length && !inputValue.length && keycode(event) === 'backspace') {
-//         this.setState({
-//           selectedItem: selectedItem.slice(0, selectedItem.length - 1),
-//         });
-//       }
-//     };
-  
-//     handleInputChange = event => {
-//       this.setState({ inputValue: event.target.value });
-//     };
-  
-//     handleChange = item => {
-//       let { selectedItem } = this.state;
-  
-//       if (selectedItem.indexOf(item) === -1) {
-//         selectedItem = [...selectedItem, item];
-//       }
-  
-//       this.setState({
-//         inputValue: '',
-//         selectedItem,
-//       });
-//     };
-  
-//     handleDelete = item => () => {
-//       this.setState(state => {
-//         const selectedItem = [...state.selectedItem];
-//         selectedItem.splice(selectedItem.indexOf(item), 1);
-//         return { selectedItem };
-//       });
-//     };
-  
+function NoOptionsMessage(props) {
+    return (
+        <Typography
+            color="textSecondary"
+            className={props.selectProps.classes.noOptionsMessage}
+            {...props.innerProps}
+        >
+            {props.children}
+        </Typography>
+    );
+}
+
+function inputComponent({ inputRef, ...props }) {
+    return <div ref={inputRef} {...props} />;
+}
+
+function Control(props) {
+    return (
+        <TextField
+            fullWidth
+            InputProps={{
+                inputComponent,
+                inputProps: {
+                    className: props.selectProps.classes.input,
+                    inputRef: props.innerRef,
+                    children: props.children,
+                    ...props.innerProps,
+                },
+            }}
+            {...props.selectProps.textFieldProps}
+        />
+    );
+}
+
+function Option(props) {
+    return (
+        <MenuItem
+            buttonRef={props.innerRef}
+            selected={props.isFocused}
+            component="div"
+            style={{
+                fontWeight: props.isSelected ? 500 : 400,
+            }}
+            {...props.innerProps}
+        >
+            {props.children}
+        </MenuItem>
+    );
+}
+
+function Placeholder(props) {
+    return (
+        <Typography
+            color="textSecondary"
+            className={props.selectProps.classes.placeholder}
+            {...props.innerProps}
+        >
+            {props.children}
+        </Typography>
+    );
+}
+
+function SingleValue(props) {
+    return (
+        <Typography className={props.selectProps.classes.singleValue} {...props.innerProps}>
+            {props.children}
+        </Typography>
+    );
+}
+
+function ValueContainer(props) {
+    return <div className={props.selectProps.classes.valueContainer}>{props.children}</div>;
+}
+
+function MultiValue(props) {
+    return (
+        <Chip
+            tabIndex={-1}
+            label={props.children}
+            className={classNames(props.selectProps.classes.chip, {
+                [props.selectProps.classes.chipFocused]: props.isFocused,
+            })}
+            onDelete={event => {
+                props.removeProps.onClick();
+                props.removeProps.onMouseDown(event);
+            }}
+        />
+    );
+}
+
+function Menu(props) {
+    return (
+        <Paper square className={props.selectProps.classes.paper} {...props.innerProps}>
+            {props.children}
+        </Paper>
+    );
+}
+
+const components = {
+    Control,
+    Menu,
+    MultiValue,
+    NoOptionsMessage,
+    Option,
+    Placeholder,
+    SingleValue,
+    ValueContainer,
+};
+
+class ProductSearch extends React.Component {
+    state = {
+        single: null
+    };
+
+    reset() {
+        this.setState({
+            single: null,
+        });
+    }
+
+    getSuggestions() {
+        return this.props.products.index.map(p => ({
+            value: p,
+            label: this.props.products.data[p].name
+        }));
+    }
+
+    handleChange = name => value => {
+        this.setState({
+            [name]: value,
+        });
+    };
+
+    render() {
+        const { classes, theme } = this.props;
+
+        const selectStyles = {
+            input: base => ({
+                ...base,
+                color: theme.palette.text.primary,
+            }),
+        };
+
+        return (
+            <div
+                style={{ marginTop: 12 }}
+                ref={this.props.inputRef}
+            >
+                <Select
+                    name={this.props.name}
+                    classes={classes}
+                    styles={selectStyles}
+                    options={this.getSuggestions()}
+                    components={components}
+                    value={this.state.single}
+                    onChange={this.handleChange('single')}
+                    placeholder="Select a product to add to this sale"
+                />
+            </div>
+        );
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        products: state.products,
+    }
+}
+
+ProductSearch.propTypes = {
+    classes: PropTypes.object.isRequired,
+    theme: PropTypes.object.isRequired,
+};
+
+export default compose(
+    withStyles(styles, {
+        withTheme: true,
+    }),
+    connect(
+        mapStateToProps
+    ),
+)(ProductSearch);
