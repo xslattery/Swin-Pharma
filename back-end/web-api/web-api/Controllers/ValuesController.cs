@@ -147,7 +147,8 @@ namespace web_api.Controllers
 
         // Used for getting all inventory items:
         [HttpGet]
-        public IEnumerable<string> Get()
+        [ProducesResponseType(200, Type = typeof(IEnumerable<string>))]
+        public IActionResult Get()
         {
             System.Diagnostics.Debug.WriteLine("########## GET Inventory");
             Console.WriteLine("########## GET Inventory");
@@ -158,12 +159,14 @@ namespace web_api.Controllers
                 result.Add(entry.ToString());
             }
 
-            return result;
+            return Ok(result);
         }
 
         // Used for getting a single inventory item:
         [HttpGet("{id}")]
-        public string Get(int id)
+        [ProducesResponseType(200, Type = typeof(string))]
+        [ProducesResponseType(404)]
+        public IActionResult Get(int id)
         {
             System.Diagnostics.Debug.WriteLine("########## GET ID Inventory");
             Console.WriteLine("########## GET ID Inventory");
@@ -173,11 +176,11 @@ namespace web_api.Controllers
             {
                 if (entry.id == id)
                 {
-                    return entry.ToString();
+                    return Ok(entry.ToString());
                 }
             }
 
-            return ""; // NOTE(Xavier): maybe this should be an error code instead of an empty string.
+            return NotFound();
         }
 
         // Used For adding a single inventory item:
@@ -222,6 +225,38 @@ namespace web_api.Controllers
                 // 400 - Failure
                 return StatusCode(400);
             }
+        }
+    
+        // Used to delete a single inventory item:
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id) {
+
+            System.Diagnostics.Debug.WriteLine("########## DELETE ID Inventory " + id.ToString());
+            Console.WriteLine("########## DELETE ID Inventory " + id.ToString());
+
+            // Remove the item if it exists
+            bool foundItem = false;
+            itemTableLock.WaitOne();
+            foreach (InventoryItem line in itemTable) {
+                if (line.id == id) {
+                    foundItem = true;
+                    itemTable.Remove(line);
+                    break;
+                }
+            }
+
+            var file = new StreamWriter(inventoryDatabaseFile);
+            foreach (var entry in itemTable)
+            {
+                file.WriteLine(entry);
+            }
+            file.Close();
+            itemTableLock.ReleaseMutex();
+
+            // If the item does not exist return a not found.
+            if (!foundItem) return NotFound();
+
+            return Ok();
         }
     }
 
@@ -321,7 +356,7 @@ namespace web_api.Controllers
         private static List<Sale> salesTable = new List<Sale>();
 
         public static int nextGroup;
-        private static Mutex nextGroupLock = new Mutex();
+        public static Mutex nextGroupLock = new Mutex();
 
         private static Mutex processingSalesLock = new Mutex();
         private static List<SalePostRecieveGroup> processingSales = new List<SalePostRecieveGroup>();
@@ -444,7 +479,7 @@ namespace web_api.Controllers
                     processingSalesLock.ReleaseMutex();
 
                     // 200 - Success
-                    return StatusCode(200);
+                    return Ok();
                 }
                 catch (Exception)
                 {
@@ -460,16 +495,82 @@ namespace web_api.Controllers
             }
         }
 
-        // Used for getting a single inventory item:
-        [Route("Group/")]
-        [HttpGet]
-        public int Get()
+        // Used for getting a single sales group:
+        [HttpGet("{id}")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<string>))]
+        [ProducesResponseType(404)]
+        public IActionResult Get(int id)
         {
-            nextGroupLock.WaitOne();
-            int result = nextGroup++;
-            nextGroupLock.ReleaseMutex();
+            System.Diagnostics.Debug.WriteLine("########## GET ID Sale");
+            Console.WriteLine("########## GET ID Sale");
 
-            return result;
+            bool foundBeginning = false;
+            List<string> result = new List<string>();
+            foreach (var entry in salesTable)
+            {
+                if (entry.groupID == id)
+                {
+                    foundBeginning = true;
+                    result.Add(entry.ToString());
+                }
+                else if (foundBeginning)
+                {
+                    break;
+                }
+            }
+
+            if (result.Count <= 0) return NotFound();
+
+            return Ok(result);
+        }
+
+        // Used for getting all sales items:
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<string>))]
+        public IActionResult Get()
+        {
+            System.Diagnostics.Debug.WriteLine("########## GET Sales");
+            Console.WriteLine("########## GET Sales");
+
+            salesTableLock.WaitOne();
+            List<string> result = new List<string>();
+            foreach (var entry in salesTable)
+            {
+                result.Add(entry.ToString());
+            }
+            salesTableLock.ReleaseMutex();
+
+            return Ok(result);
+        }
+    }
+
+    // This is a helper class to mamnage getting unique group
+    // id's for new sales that are being added:
+    [Route("api/[controller]")]
+    public class GroupController : Controller
+    {
+        static bool loadSalesOnce_hack = false;
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(int))]
+        public IActionResult Get()
+        {
+            // This is done to fix the isue where the sales may
+            // not be loaded before a group get is made.
+            if (!loadSalesOnce_hack)
+            {
+                loadSalesOnce_hack = true;
+                SalesController sc = new SalesController();
+            }
+
+            System.Diagnostics.Debug.WriteLine("########## GROUP GET: ");
+            Console.WriteLine("########## GROUP GET: ");
+
+            SalesController.nextGroupLock.WaitOne();
+            int result = SalesController.nextGroup++;
+            SalesController.nextGroupLock.ReleaseMutex();
+
+            return Ok(result);
         }
     }
 
