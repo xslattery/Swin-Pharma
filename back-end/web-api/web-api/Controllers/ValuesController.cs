@@ -226,10 +226,11 @@ namespace web_api.Controllers
                 return StatusCode(400);
             }
         }
-    
+
         // Used to delete a single inventory item:
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id) {
+        public IActionResult Delete(int id)
+        {
 
             System.Diagnostics.Debug.WriteLine("########## DELETE ID Inventory " + id.ToString());
             Console.WriteLine("########## DELETE ID Inventory " + id.ToString());
@@ -237,8 +238,10 @@ namespace web_api.Controllers
             // Remove the item if it exists
             bool foundItem = false;
             itemTableLock.WaitOne();
-            foreach (InventoryItem line in itemTable) {
-                if (line.id == id) {
+            foreach (var line in itemTable)
+            {
+                if (line.id == id)
+                {
                     foundItem = true;
                     itemTable.Remove(line);
                     break;
@@ -259,29 +262,27 @@ namespace web_api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, InventoryItemPostRecieve model) {
-            System.Diagnostics.Debug.WriteLine("########## PUT Inventory " + id.ToString());
-            Console.WriteLine("########## PUT Inventory " + id.ToString());
+        public IActionResult Update(int id, InventoryItemPostRecieve model)
+        {
+            if (model != null)
+            {
+                try
+                {
+                    System.Diagnostics.Debug.WriteLine("########## PUT ID Inventory " + id.ToString());
+                    Console.WriteLine("########## PUT ID Inventory " + id.ToString());
 
-            if (model != null) {
-                try {
-                    InventoryItem item = new InventoryItem(
-                        id,
-                        model.Name, 
-                        model.Brand, 
-                        model.Barcode, 
-                        model.PurchasePrice, 
-                        model.RetailPrice, 
-                        model.Quantity);
-                    
-                    bool foundItem = false;
-                    itemTableLock.WaitOne();
+                    InventoryItem newItem = new InventoryItem(id, model.Name, model.Brand, model.Barcode, model.PurchasePrice, model.RetailPrice, model.Quantity);
 
                     // Check to see if the item exists
-                    foreach (InventoryItem line in itemTable) {
+                    bool foundItem = false;
+                    itemTableLock.WaitOne();
+                    for (int i = 0; i < itemTable.Count; i++)
+                    {
                         // If item is found, replace with updated data
-                        if (line.id == id) {
-                            // ############# Help
+                        if (itemTable[i].id == id)
+                        {
+                            foundItem = true;
+                            itemTable[i] = newItem;
                             break;
                         }
                     }
@@ -297,11 +298,19 @@ namespace web_api.Controllers
 
                     // If the item does not exist return a not found.
                     if (!foundItem) return NotFound();
+
                     return Ok();
-                } catch (Exception e) {
+                }
+                catch (Exception)
+                {
                     // Internal Error
                     return StatusCode(500);
                 }
+            }
+            else
+            {
+                // 400 - Failure
+                return StatusCode(400);
             }
         }
     }
