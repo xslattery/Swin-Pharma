@@ -156,9 +156,9 @@ class ProductsPage extends Component {
                                                 size="small"
                                                 onClick={((productCode) => {
                                                     return () => {
-                                                        axios.delete('api/Inventory/' + productCode)
+                                                        axios.delete(appConfig.serverRoot + 'api/Inventory/' + productCode)
                                                             .then((res) => {
-                                                                console.log(res);
+                                                                this.props.fetchProducts()
                                                             });
                                                     }
                                                 })(productCode)}
