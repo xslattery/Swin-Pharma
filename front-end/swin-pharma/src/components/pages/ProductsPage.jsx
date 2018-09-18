@@ -20,8 +20,27 @@ import axios from 'axios';
 import { fetchProducts } from '../../actions/index';
 import { bindActionCreators } from 'redux';
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 class ProductsPage extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showingEditModal: false
+        }
+    }
+    handleClickOpen = (productCode) => {
+        this.setState({ showingEditModal: true });
+    };
+
+    handleClose = () => {
+        this.setState({ showingEditModal: false });
+    };
     componentDidMount() {
         this.props.fetchProducts();
     }
@@ -129,14 +148,15 @@ class ProductsPage extends Component {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Product Code</TableCell>
+                                <TableCell numeric>Product #</TableCell>
                                 <TableCell>Brand</TableCell>
                                 <TableCell>Name</TableCell>
-                                <TableCell>SKU</TableCell>
-                                <TableCell>Cost</TableCell>
-                                <TableCell>Price</TableCell>
-                                <TableCell>Stock Level</TableCell>
-                                <TableCell>Delete</TableCell>
+                                <TableCell numeric>SKU</TableCell>
+                                <TableCell numeric>Cost</TableCell>
+                                <TableCell numeric>Price</TableCell>
+                                <TableCell numeric>Stock Level</TableCell>
+                                <TableCell numeric>Edit</TableCell>
+                                <TableCell numeric>Delete</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -144,14 +164,24 @@ class ProductsPage extends Component {
                                 var thisProduct = this.props.products.data[productCode];
                                 return (
                                     <TableRow key={productCode}>
-                                        <TableCell>{productCode}</TableCell>
+                                        <TableCell numeric>{productCode}</TableCell>
                                         <TableCell>{thisProduct.brand}</TableCell>
                                         <TableCell>{thisProduct.name}</TableCell>
-                                        <TableCell>{thisProduct.sku}</TableCell>
-                                        <TableCell>{thisProduct.cost}</TableCell>
-                                        <TableCell>{thisProduct.price}</TableCell>
-                                        <TableCell>{thisProduct.stockLevel}</TableCell>
-                                        <TableCell>
+                                        <TableCell numeric>{thisProduct.sku}</TableCell>
+                                        <TableCell numeric>{thisProduct.cost}</TableCell>
+                                        <TableCell numeric>{thisProduct.price}</TableCell>
+                                        <TableCell numeric>{thisProduct.stockLevel}</TableCell>
+                                        <TableCell numeric>
+                                            <Button
+                                                size="small"
+                                                onClick={() => {
+                                                    this.handleClickOpen(productCode);
+                                                }}
+                                            >
+                                                <EditIcon />
+                                            </Button>
+                                        </TableCell>
+                                        <TableCell numeric>
                                             <Button
                                                 size="small"
                                                 onClick={((productCode) => {
@@ -172,6 +202,32 @@ class ProductsPage extends Component {
                         </TableBody>
                     </Table>
                 </ViewFrame>
+                <Dialog
+                    open={this.state.showingEditModal}
+                    onClose={this.handleClose}
+                >
+                    <DialogTitle>Edit Product</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                        </DialogContentText>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            label="Email Address"
+                            type="email"
+                            fullWidth
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={this.handleClose}>
+                            Cancel
+                        </Button>
+                        <Button onClick={this.handleClose}>
+                            Save
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </React.Fragment>
         );
     }
