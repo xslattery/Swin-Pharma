@@ -28,16 +28,17 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import { func } from 'prop-types';
+import qs from 'qs';
 
 function resolveFieldDisplayName(fieldName) {
     var definitions = {
-        'productCode': 'Product #',
+        'id': 'Product #',
         'brand': 'Brand Name',
         'name': 'Product Name',
         'sku': 'SKU',
         'cost': 'Supply Cost',
         'price': 'Retail Price',
-        'stockLevel': 'Stock Level',
+        'quantity': 'Stock Level',
     }
     for (var d in definitions) {
         if (d == fieldName) return definitions[d];
@@ -127,26 +128,25 @@ class ProductsPage extends Component {
             });
     }
     editProduct() {
-
         // prep data
         var data = {
             ...this.props.products.data[this.state.editDialogueProductCode]
         }
         data[this.state.editDialogueFieldName] = this.state.editDialogueFieldValue;
-
+        console.log(data);
         // submit update request
-        axios({
-            method: 'PUT',
-            url: appConfig.serverRoot + 'api/Inventory/' + this.state.editDialogueProductCode,
-            data: data
-        })
-            .then(() => {
-                this.props.fetchProducts()
-            })
-            .catch(function (error) {
-                alert('An unexpected error occurred while editing product.');
-                window.location.reload();
-            });
+        // axios({
+        //     method: 'PUT',
+        //     url: appConfig.serverRoot + 'api/Inventory/' + this.state.editDialogueProductCode,
+        //     data: qs.stringify(data)
+        // })
+        //     .then(() => {
+        //         this.props.fetchProducts()
+        //     })
+        //     .catch(function (error) {
+        //         alert('An unexpected error occurred while editing product.');
+        //         window.location.reload();
+        //     });
     }
     render() {
         return (
@@ -235,10 +235,10 @@ class ProductsPage extends Component {
                                 <TableCell numeric>{resolveFieldDisplayName('productCode')}</TableCell>
                                 <TableCell>{resolveFieldDisplayName('brand')}</TableCell>
                                 <TableCell>{resolveFieldDisplayName('name')}</TableCell>
-                                <TableCell>{resolveFieldDisplayName('sku')}</TableCell>
+                                <TableCell>{resolveFieldDisplayName('barcode')}</TableCell>
                                 <TableCell numeric>{resolveFieldDisplayName('cost')}</TableCell>
                                 <TableCell numeric>{resolveFieldDisplayName('price')}</TableCell>
-                                <TableCell numeric>{resolveFieldDisplayName('stockLevel')}</TableCell>
+                                <TableCell numeric>{resolveFieldDisplayName('quantity')}</TableCell>
                                 <TableCell numeric>Delete</TableCell>
                             </TableRow>
                         </TableHead>
@@ -250,10 +250,10 @@ class ProductsPage extends Component {
                                         <TableCell numeric>{productCode}</TableCell>
                                         <TableCell>{this.EditableField(thisProduct.brand, productCode, "brand")}</TableCell>
                                         <TableCell>{this.EditableField(thisProduct.name, productCode, "name")}</TableCell>
-                                        <TableCell>{this.EditableField(thisProduct.sku, productCode, "sku")}</TableCell>
+                                        <TableCell>{this.EditableField(thisProduct.barcode, productCode, "sku")}</TableCell>
                                         <TableCell numeric>{this.EditableField(thisProduct.cost, productCode, "cost")}</TableCell>
                                         <TableCell numeric>{this.EditableField(thisProduct.price, productCode, "price")}</TableCell>
-                                        <TableCell numeric>{this.EditableField(thisProduct.stockLevel, productCode, "stockLevel")}</TableCell>
+                                        <TableCell numeric>{this.EditableField(thisProduct.quantity, productCode, "stockLevel")}</TableCell>
                                         <TableCell numeric>
                                             <DeleteButton />
                                         </TableCell>
@@ -293,7 +293,7 @@ class ProductsPage extends Component {
                             color="primary"
                             onClick={() => {
                                 this.editProduct();
-                                this.submitFieldChange();
+                                this.closeEditDialogue();
                             }}>
                             Save
                         </Button>

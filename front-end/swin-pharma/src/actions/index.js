@@ -41,10 +41,10 @@ export const fetchProducts = () => {
                 products.data[columns[0]] = {
                     name: columns[1],
                     brand: columns[2],
-                    sku: columns[3],
+                    barcode: columns[3],
                     cost: columns[4],
                     price: columns[5],
-                    stockLevel: columns[6],
+                    quantity: columns[6],
                 }
                 products.index[i] = columns[0];
             }
@@ -66,13 +66,13 @@ export const fetchSales = () => {
             for (var i = 0; i < rows.length; i++) {
                 var columns = rows[i].split(',');
                 sales.data[columns[0]] = {
-                    group_id: columns[1],
-                    item_id: columns[2],
+                    groupId: columns[1],
+                    itemId: columns[2],
                     date: columns[3],
                     time: columns[4],
                     quantity: columns[5],
-                    number_in_group: columns[6],
-                    last_in_group: columns[7],
+                    numberInGroup: columns[6],
+                    lastInGroup: columns[7],
                 }
                 sales.index[i] = columns[0];
             }
