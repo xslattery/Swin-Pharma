@@ -19,6 +19,7 @@ import axios from 'axios';
 import DeleteIcon from '@material-ui/icons/Delete';
 import zeroFill from '../../scripts/zeroFill';
 import { bindActionCreators } from 'redux';
+import qs from 'qs';
 
 class SalesRecordBuilder extends Component {
     constructor(props) {
@@ -75,29 +76,43 @@ class SalesRecordBuilder extends Component {
         axios.get(appConfig.serverRoot + 'api/group').then((res) => {
             var salesRecordId = res.data;
             var currentdate = new Date();
-            var salesRecordDate = currentdate.getDate() + "/" + currentdate.getMonth() + "/" + currentdate.getYear();
+            var salesRecordDate = zeroFill(currentdate.getDate(), 2) + "/" + zeroFill(currentdate.getMonth(), 2) + "/" + (currentdate.getYear() + 1900);
             var salesRecordTime = zeroFill(currentdate.getHours(), 2) + ':' + zeroFill(currentdate.getMinutes(), 2);
 
+            // submit post request for each row
             for (var i = 0; i < this.state.rows.length; i++) {
                 (() => {
                     var thisRow = this.state.rows[i];
                     var isLast = i == this.state.rows.length - 1;
-                    axios.post(appConfig.serverRoot + 'api/Sales', {
-                        group_id: salesRecordId,
-                        item_id: thisRow.item_id,
-                        date: salesRecordDate,
-                        time: salesRecordTime,
-                        quantity: thisRow.quantity,
-                        number_in_group: i,
-                        last_in_group: i == this.state.rows.length - 1 ? true : false
-                    }).then((res) => {
-                        if (isLast) {
-                            this.props.fetchSales();
-                        }
-                        console.log(res);
-                    }).catch((err) => {
-                        console.log(err);
-                    });
+                    console.log(qs.stringify({
+                        GroupID: salesRecordId,
+                        ItemID: thisRow.item_id,
+                        Date: salesRecordDate,
+                        Time: salesRecordTime,
+                        Quantity: thisRow.quantity,
+                        NumberInGroup: i,
+                        LastInGroup: i == this.state.rows.length - 1 ? true : false
+                    }))
+                    axios.post(appConfig.serverRoot + 'api/Sales', qs.stringify({
+                        GroupID: salesRecordId,
+                        ItemID: thisRow.item_id,
+                        Date: salesRecordDate,
+                        Time: salesRecordTime,
+                        Quantity: thisRow.quantity,
+                        NumberInGroup: i,
+                        LastInGroup: i == this.state.rows.length - 1 ? true : false
+                    }), {
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        }).then((res) => {
+                            if (isLast) {
+                                this.props.fetchSales();
+                            }
+                            console.log(res);
+                        }).catch((err) => {
+                            console.log(err);
+                        });
                 })();
             }
         });

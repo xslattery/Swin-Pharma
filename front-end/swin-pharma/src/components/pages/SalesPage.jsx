@@ -11,12 +11,6 @@ import appConfig from '../../scripts/config';
 import axios from 'axios';
 import SalesRecordBuilder from '../etc/SalesRecordBuilder';
 
-let id = 0;
-function createData(name, calories, fat, carbs, protein) {
-    id += 1;
-    return { id, name, calories, fat, carbs, protein };
-}
-
 class SalesPage extends Component {
     addSalesRecord(e) {
         e.preventDefault();
@@ -51,7 +45,7 @@ class SalesPage extends Component {
                         <TableHead>
                             <TableRow>
                                 <TableCell numeric>Sale #</TableCell>
-                                <TableCell numeric>Product Name</TableCell>
+                                <TableCell numeric>Product #</TableCell>
                                 <TableCell numeric>Quantity</TableCell>
                                 <TableCell numeric>Date</TableCell>
                                 <TableCell numeric>Time</TableCell>
@@ -63,7 +57,7 @@ class SalesPage extends Component {
                                 return (
                                     <TableRow key={saleId}>
                                         <TableCell component="th" scope="row" numeric>{thisRow.group_id}</TableCell>
-                                        <TableCell numeric>{this.props.products.data[thisRow.item_id].name}</TableCell>
+                                        <TableCell numeric>{thisRow.item_id}</TableCell>
                                         <TableCell numeric>{thisRow.quantity}</TableCell>
                                         <TableCell numeric>{thisRow.date}</TableCell>
                                         <TableCell numeric>{thisRow.time}</TableCell>
