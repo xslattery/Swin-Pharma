@@ -194,42 +194,43 @@ namespace web_api.Controllers
         {
             if (model != null)
             {
-                try
+                if (model.Name != null && model.Brand != null && model.Barcode != null && model.RetailPrice != null && model.PurchasePrice != null)
                 {
-                    itemTableLock.WaitOne();
-                    InventoryItem item = new InventoryItem(nextItemID++, model.Name, model.Brand, model.Barcode, model.PurchasePrice, model.RetailPrice, model.Quantity);
-                    itemTable.Add(item);
-                    itemTableLock.ReleaseMutex();
-
-                    System.Diagnostics.Debug.WriteLine("########## INVENTORY POST: " + model);
-                    Console.WriteLine("########## INVENTORY POST: " + model);
-
-                    // NOTE(Xavier): It is probably not the best idea to do this
-                    // here because it will be called for each request.
-                    itemTableLock.WaitOne();
-                    var file = new StreamWriter(inventoryDatabaseFile);
-                    foreach (var entry in itemTable)
+                    try
                     {
-                        file.WriteLine(entry);
-                    }
-                    file.Close();
-                    itemTableLock.ReleaseMutex();
+                        itemTableLock.WaitOne();
+                        InventoryItem item = new InventoryItem(nextItemID++, model.Name, model.Brand, model.Barcode, model.PurchasePrice, model.RetailPrice, model.Quantity);
+                        itemTable.Add(item);
+                        itemTableLock.ReleaseMutex();
 
-                    // 200 - Success
-                    return StatusCode(200);
-                }
-                catch (Exception)
-                {
-                    // 403 - Forbidden. The request was legal but the server is refusing to respond to it.
-                    // The Model is incomplete.
-                    return StatusCode(403);
+                        System.Diagnostics.Debug.WriteLine("########## INVENTORY POST: " + model);
+                        Console.WriteLine("########## INVENTORY POST: " + model);
+
+                        // NOTE(Xavier): It is probably not the best idea to do this
+                        // here because it will be called for each request.
+                        itemTableLock.WaitOne();
+                        var file = new StreamWriter(inventoryDatabaseFile);
+                        foreach (var entry in itemTable)
+                        {
+                            file.WriteLine(entry);
+                        }
+                        file.Close();
+                        itemTableLock.ReleaseMutex();
+
+                        // 200 - Success
+                        return StatusCode(200);
+                    }
+                    catch (Exception)
+                    {
+                        // 403 - Forbidden. The request was legal but the server is refusing to respond to it.
+                        // The Model is incomplete.
+                        return StatusCode(403);
+                    }
                 }
             }
-            else
-            {
-                // 400 - Failure
-                return StatusCode(400);
-            }
+
+            // 400 - Failure
+            return StatusCode(400);
         }
 
         // Used to delete a single inventory item:
