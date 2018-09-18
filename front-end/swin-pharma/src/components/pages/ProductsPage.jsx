@@ -26,20 +26,82 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import IconButton from '@material-ui/core/IconButton';
+import { func } from 'prop-types';
+
+function resolveFieldDisplayName(fieldName) {
+    var definitions = {
+        'productCode': 'Product #',
+        'brand': 'Brand Name',
+        'name': 'Product Name',
+        'sku': 'SKU',
+        'cost': 'Supply Cost',
+        'price': 'Retail Price',
+        'stockLevel': 'Stock Level',
+    }
+    for (var d in definitions) {
+        if (d == fieldName) return definitions[d];
+    }
+    return fieldName;
+}
+
+const DeleteButton = ({ productCode }) => {
+    return (
+        <IconButton
+            onClick={((productCode) => {
+                return () => {
+                    if (window.confirm('Are you sure you want to delete product ' + productCode)) {
+                        axios.delete(appConfig.serverRoot + 'api/Inventory/' + productCode)
+                            .then((res) => {
+                                this.props.fetchProducts()
+                            });
+                    }
+                }
+            })(productCode)
+            }
+        >
+            <DeleteIcon fontSize="small" />
+        </IconButton >
+    )
+}
 
 class ProductsPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showingEditModal: false
+            showingEditDialogue: false,
+            editDialogueProductCode: "",
+            editDialogueFieldName: "",
+            editDialogueFieldValue: ""
         }
     }
-    handleClickOpen = (productCode) => {
-        this.setState({ showingEditModal: true });
-    };
-
-    handleClose = () => {
-        this.setState({ showingEditModal: false });
+    getProductById(id) {
+        for (var p in this.props.products.data) {
+            if (p == id) return this.props.products.data[p];
+        }
+        return "";
+    }
+    EditableField(text, productCode, fieldName) {
+        return (
+            <a
+                className="editable-field"
+                href="#"
+                onClick={() => {
+                    this.setState({
+                        showingEditDialogue: true,
+                        editDialogueProductCode: productCode,
+                        editDialogueFieldName: fieldName,
+                        editDialogueFieldValue: this.getProductById(productCode)[fieldName]
+                    })
+                }}
+            >
+                {text}
+                <span className="editable-field-icon"><EditIcon fontSize="inherit" /></span>
+            </a>
+        )
+    }
+    closeEditDialogue = () => {
+        this.setState({ ...this.state, showingEditDialogue: false });
     };
     componentDidMount() {
         this.props.fetchProducts();
@@ -60,8 +122,29 @@ class ProductsPage extends Component {
         })
             .then(fetchProducts)
             .catch(function (error) {
-                alert(error);
                 alert('An unexpected error occurred while adding a new product.');
+                window.location.reload();
+            });
+    }
+    editProduct() {
+
+        // prep data
+        var data = {
+            ...this.props.products.data[this.state.editDialogueProductCode]
+        }
+        data[this.state.editDialogueFieldName] = this.state.editDialogueFieldValue;
+
+        // submit update request
+        axios({
+            method: 'PUT',
+            url: appConfig.serverRoot + 'api/Inventory/' + this.state.editDialogueProductCode,
+            data: data
+        })
+            .then(() => {
+                this.props.fetchProducts()
+            })
+            .catch(function (error) {
+                alert('An unexpected error occurred while editing product.');
                 window.location.reload();
             });
     }
@@ -87,8 +170,9 @@ class ProductsPage extends Component {
                                     fullWidth
                                     multiline
                                     rowsMax="4"
+                                    autoComplete="off"
                                     name="Name"
-                                    label="Name"
+                                    label="Product Name"
                                 />
                             </Grid>
                             <Grid item md={3} sm={12}>
@@ -148,14 +232,13 @@ class ProductsPage extends Component {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell numeric>Product #</TableCell>
-                                <TableCell>Brand</TableCell>
-                                <TableCell>Name</TableCell>
-                                <TableCell numeric>SKU</TableCell>
-                                <TableCell numeric>Cost</TableCell>
-                                <TableCell numeric>Price</TableCell>
-                                <TableCell numeric>Stock Level</TableCell>
-                                <TableCell numeric>Edit</TableCell>
+                                <TableCell numeric>{resolveFieldDisplayName('productCode')}</TableCell>
+                                <TableCell>{resolveFieldDisplayName('brand')}</TableCell>
+                                <TableCell>{resolveFieldDisplayName('name')}</TableCell>
+                                <TableCell>{resolveFieldDisplayName('sku')}</TableCell>
+                                <TableCell numeric>{resolveFieldDisplayName('cost')}</TableCell>
+                                <TableCell numeric>{resolveFieldDisplayName('price')}</TableCell>
+                                <TableCell numeric>{resolveFieldDisplayName('stockLevel')}</TableCell>
                                 <TableCell numeric>Delete</TableCell>
                             </TableRow>
                         </TableHead>
@@ -165,36 +248,14 @@ class ProductsPage extends Component {
                                 return (
                                     <TableRow key={productCode}>
                                         <TableCell numeric>{productCode}</TableCell>
-                                        <TableCell>{thisProduct.brand}</TableCell>
-                                        <TableCell>{thisProduct.name}</TableCell>
-                                        <TableCell numeric>{thisProduct.sku}</TableCell>
-                                        <TableCell numeric>{thisProduct.cost}</TableCell>
-                                        <TableCell numeric>{thisProduct.price}</TableCell>
-                                        <TableCell numeric>{thisProduct.stockLevel}</TableCell>
+                                        <TableCell>{this.EditableField(thisProduct.brand, productCode, "brand")}</TableCell>
+                                        <TableCell>{this.EditableField(thisProduct.name, productCode, "name")}</TableCell>
+                                        <TableCell>{this.EditableField(thisProduct.sku, productCode, "sku")}</TableCell>
+                                        <TableCell numeric>{this.EditableField(thisProduct.cost, productCode, "cost")}</TableCell>
+                                        <TableCell numeric>{this.EditableField(thisProduct.price, productCode, "price")}</TableCell>
+                                        <TableCell numeric>{this.EditableField(thisProduct.stockLevel, productCode, "stockLevel")}</TableCell>
                                         <TableCell numeric>
-                                            <Button
-                                                size="small"
-                                                onClick={() => {
-                                                    this.handleClickOpen(productCode);
-                                                }}
-                                            >
-                                                <EditIcon />
-                                            </Button>
-                                        </TableCell>
-                                        <TableCell numeric>
-                                            <Button
-                                                size="small"
-                                                onClick={((productCode) => {
-                                                    return () => {
-                                                        axios.delete(appConfig.serverRoot + 'api/Inventory/' + productCode)
-                                                            .then((res) => {
-                                                                this.props.fetchProducts()
-                                                            });
-                                                    }
-                                                })(productCode)}
-                                            >
-                                                <DeleteIcon />
-                                            </Button>
+                                            <DeleteButton />
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -203,27 +264,37 @@ class ProductsPage extends Component {
                     </Table>
                 </ViewFrame>
                 <Dialog
-                    open={this.state.showingEditModal}
-                    onClose={this.handleClose}
+                    open={this.state.showingEditDialogue}
+                    onClose={this.closeEditDialogue}
                 >
-                    <DialogTitle>Edit Product</DialogTitle>
+                    <DialogTitle>{this.getProductById(this.state.editDialogueProductCode).name}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
+
                         </DialogContentText>
                         <TextField
                             autoFocus
+                            value={this.state.editDialogueFieldValue}
                             margin="dense"
                             id="name"
-                            label="Email Address"
+                            label={resolveFieldDisplayName(this.state.editDialogueFieldName)}
+                            onChange={() => { this.setState({ ...this.state, editDialogueFieldValue: this.value }) }}
                             type="email"
                             fullWidth
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleClose}>
+                        <Button
+                            color="secondary"
+                            onClick={this.closeEditDialogue}>
                             Cancel
                         </Button>
-                        <Button onClick={this.handleClose}>
+                        <Button
+                            color="primary"
+                            onClick={() => {
+                                this.editProduct();
+                                this.submitFieldChange();
+                            }}>
                             Save
                         </Button>
                     </DialogActions>
@@ -233,7 +304,7 @@ class ProductsPage extends Component {
     }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = function (state) {
     return {
         products: state.products,
     }

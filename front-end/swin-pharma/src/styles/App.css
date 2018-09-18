@@ -86,3 +86,23 @@ body {
 .gl-heading{
   margin: 2rem 2rem 0 2rem;
 }
+
+.editable-field{
+  text-decoration: none;
+  margin-right:1.3rem;
+  color:inherit;
+}
+
+.editable-field-icon{
+  display: none;
+  margin-left:0.5rem;
+}
+
+.editable-field:hover{
+  text-decoration: underline;
+  margin-right: 0;
+}
+
+.editable-field:hover > .editable-field-icon{
+  display: inline-block;
+}
