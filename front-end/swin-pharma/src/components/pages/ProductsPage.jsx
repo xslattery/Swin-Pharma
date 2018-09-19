@@ -45,30 +45,6 @@ function resolveFieldDisplayName(fieldName) {
   return fieldName;
 }
 
-const DeleteButton = ({ productCode }) => {
-  return (
-    <IconButton
-      onClick={(productCode => {
-        return () => {
-          if (
-            window.confirm(
-              "Are you sure you want to delete product " + productCode
-            )
-          ) {
-            axios
-              .delete(appConfig.serverRoot + "api/Inventory/" + productCode)
-              .then(res => {
-                this.props.fetchProducts();
-              });
-          }
-        };
-      })(productCode)}
-    >
-      <DeleteIcon />
-    </IconButton>
-  );
-};
-
 class ProductsPage extends Component {
   constructor(props) {
     super(props);
@@ -78,6 +54,29 @@ class ProductsPage extends Component {
       editDialogueFieldName: "",
       editDialogueFieldValue: ""
     };
+  }
+  deleteButton(productCode) {
+    return (
+      <IconButton
+        onClick={(productCode => {
+          return () => {
+            if (
+              window.confirm(
+                "Are you sure you want to delete product " + productCode
+              )
+            ) {
+              axios
+                .delete(appConfig.serverRoot + "api/Inventory/" + productCode)
+                .then(res => {
+                  this.props.fetchProducts();
+                });
+            }
+          };
+        })(productCode)}
+      >
+        <DeleteIcon />
+      </IconButton>
+    );
   }
   getProductById(id) {
     for (var p in this.props.products.data) {
@@ -312,7 +311,7 @@ class ProductsPage extends Component {
                       )}
                     </TableCell>
                     <TableCell numeric>
-                      <DeleteButton />
+                      {this.deleteButton(productCode)}
                     </TableCell>
                   </TableRow>
                 );

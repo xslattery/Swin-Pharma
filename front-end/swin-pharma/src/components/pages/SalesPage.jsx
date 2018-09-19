@@ -24,28 +24,6 @@ import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import qs from "qs";
 
-const DeleteButton = ({ saleId }) => {
-  return (
-    <IconButton
-      onClick={(saleId => {
-        return () => {
-          if (
-            window.confirm("Are you sure you want to delete sale " + saleId)
-          ) {
-            axios
-              .delete(appConfig.serverRoot + "api/Sales/" + saleId)
-              .then(res => {
-                this.props.fetchSales();
-              });
-          }
-        };
-      })(saleId)}
-    >
-      <DeleteIcon />
-    </IconButton>
-  );
-};
-
 function resolveFieldDisplayName(fieldName) {
   var definitions = {
     saleId: "Sale #",
@@ -69,6 +47,27 @@ class SalesPage extends Component {
       editDialogueFieldName: "",
       editDialogueFieldValue: ""
     };
+  }
+  deleteButton(saleId) {
+    return (
+      <IconButton
+        onClick={(saleId => {
+          return () => {
+            if (
+              window.confirm("Are you sure you want to delete sale " + saleId)
+            ) {
+              axios
+                .delete(appConfig.serverRoot + "api/Sales/" + saleId)
+                .then(res => {
+                  this.props.fetchSales();
+                });
+            }
+          };
+        })(saleId)}
+      >
+        <DeleteIcon />
+      </IconButton>
+    );
   }
   addSalesRecord(e) {
     e.preventDefault();
@@ -185,9 +184,7 @@ class SalesPage extends Component {
                     <TableCell numeric>
                       {this.EditableField(thisRow.time, saleId, "time")}
                     </TableCell>
-                    <TableCell numeric>
-                      <DeleteButton />
-                    </TableCell>
+                    <TableCell numeric>{this.deleteButton(saleId)}</TableCell>
                   </TableRow>
                 );
               })}
