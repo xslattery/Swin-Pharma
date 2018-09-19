@@ -104,10 +104,10 @@ namespace web_api.Controllers
     [Route("api/[controller]")]
     public class InventoryController : Controller
     {
-        private static string inventoryDatabaseFile;
-        private static Mutex itemTableLock = new Mutex();
-        private static bool itemTableLoadedFromFile = false;
-        private static List<InventoryItem> itemTable = new List<InventoryItem>();
+        public static string inventoryDatabaseFile;
+        public static Mutex itemTableLock = new Mutex();
+        public static bool itemTableLoadedFromFile = false;
+        public static List<InventoryItem> itemTable = new List<InventoryItem>();
         private static int nextItemID = 1;
 
         public InventoryController() : base()
@@ -494,6 +494,27 @@ namespace web_api.Controllers
                         Sale sale = new Sale(salesTable.Count + 1, item.GroupID, item.ItemID, item.Quantity, item.Date, item.Time);
                         salesTable.Add(sale);
 
+                        if (!InventoryController.itemTableLoadedFromFile) 
+                            InventoryController temp = new InventoryController();
+
+                        InventoryController.itemTableLock.WaitOne();
+                        foreach (var inven in InventoryController.itemTable)
+                        {
+                            if (inven.id == item.id) 
+                            {
+                                inven.quantity -= item.quantity;
+                                break;
+                            }
+                        }
+
+                        var file = new StreamWriter(InventoryController.inventoryDatabaseFile);
+                        foreach (var entry in InventoryController.itemTable)
+                        {
+                            file.WriteLine(entry);
+                        }
+                        file.Close();
+                        InventoryController.itemTableLock.ReleaseMutex();
+
                         // NOTE(Xavier): It is probably not the best idea to do this here
                         // because it will be called for each complete group to be added.
                         var file = new StreamWriter(salesDatabaseFile);
@@ -516,45 +537,44 @@ namespace web_api.Controllers
         {
             if (model != null)
             {
-                try
+                if (model.date != null && model.time != null) 
                 {
-                    System.Diagnostics.Debug.WriteLine("########## SALES POST: " + model);
-                    Console.WriteLine("########## SALES POST: " + model);
-
-                    processingSalesLock.WaitOne();
-                    bool foundGroup = false;
-                    foreach (var group in processingSales)
+                    try
                     {
-                        if (group.groupID == model.GroupID)
+                        System.Diagnostics.Debug.WriteLine("########## SALES POST: " + model);
+                        Console.WriteLine("########## SALES POST: " + model);
+
+                        processingSalesLock.WaitOne();
+                        bool foundGroup = false;
+                        foreach (var group in processingSales)
                         {
-                            foundGroup = true;
-                            ProcessPostGroup(group, model);
-                            break;
+                            if (group.groupID == model.GroupID)
+                            {
+                                foundGroup = true;
+                                ProcessPostGroup(group, model);
+                                break;
+                            }
                         }
-                    }
-                    if (!foundGroup)
-                    {
-                        SalePostRecieveGroup group = new SalePostRecieveGroup();
-                        group.groupID = model.GroupID;
-                        ProcessPostGroup(group, model);
-                    }
-                    processingSalesLock.ReleaseMutex();
+                        if (!foundGroup)
+                        {
+                            SalePostRecieveGroup group = new SalePostRecieveGroup();
+                            group.groupID = model.GroupID;
+                            ProcessPostGroup(group, model);
+                        }
+                        processingSalesLock.ReleaseMutex();
 
-                    // 200 - Success
-                    return Ok();
-                }
-                catch (Exception)
-                {
-                    // 403 - Forbidden. The request was legal but the server is refusing to respond to it.
-                    // The Model is incomplete.
-                    return StatusCode(403);
+                        // 200 - Success
+                        return Ok();
+                    }
+                    catch (Exception)
+                    {
+                        // 403 - Forbidden. The request was legal but the server is refusing to respond to it.
+                        // The Model is incomplete.
+                        return StatusCode(403);
+                    }
                 }
             }
-            else
-            {
-                // 400 - Failure
-                return StatusCode(400);
-            }
+            return StatusCode(400);
         }
 
         // Used for getting a single sales group:
