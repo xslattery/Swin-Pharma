@@ -11,7 +11,7 @@ namespace web_api.Controllers
 {
     /// ////////////////////////////////////////////////////////////////////////////////
     /// ////////////////////////////////////////////////////////////////////////////////
-    /// SALES:
+    /// SALE:
     /// ////////////////////////////////////////////////////////////////////////////////
     /// ////////////////////////////////////////////////////////////////////////////////
 
@@ -122,9 +122,9 @@ namespace web_api.Controllers
     public class SalesController : Controller
     {
         private static string salesDatabaseFile;
-        private static Mutex salesTableLock = new Mutex();
-        private static bool salesTableLoadedFromFile = false;
-        private static List<Sale> salesTable = new List<Sale>();
+        public static Mutex salesTableLock = new Mutex();
+        public static bool salesTableLoadedFromFile = false;
+        public static List<Sale> salesTable = new List<Sale>();
 
         public static int nextGroup;
         public static Mutex nextGroupLock = new Mutex();
@@ -286,20 +286,6 @@ namespace web_api.Controllers
             return StatusCode(400);
         }
 
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(int))]
-        public IActionResult Get()
-        {
-            System.Diagnostics.Debug.WriteLine("########## GROUP GET: ");
-            Console.WriteLine("########## GROUP GET: ");
-
-            nextGroupLock.WaitOne();
-            int result = nextGroup++;
-            nextGroupLock.ReleaseMutex();
-
-            return Ok(result);
-        }
-
         // Used for getting a single sales group:
         [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<string>))]
@@ -422,4 +408,36 @@ namespace web_api.Controllers
             return StatusCode(400);
         }
     }
+
+    // This is a helper class to mamnage getting unique group
+    // id's for new sales that are being added:
+    [EnableCors("SiteCorsPolicy")]
+    [Route("api/[controller]")]
+    public class GroupController : Controller
+    {
+        static bool loadSalesOnce_hack = false;
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(int))]
+        public IActionResult Get()
+        {
+            // This is done to fix the isue where the sales may
+            // not be loaded before a group get is made.
+            if (!loadSalesOnce_hack)
+            {
+                loadSalesOnce_hack = true;
+                SalesController sc = new SalesController();
+            }
+
+            System.Diagnostics.Debug.WriteLine("########## GROUP GET: ");
+            Console.WriteLine("########## GROUP GET: ");
+
+            SalesController.nextGroupLock.WaitOne();
+            int result = SalesController.nextGroup++;
+            SalesController.nextGroupLock.ReleaseMutex();
+
+            return Ok(result);
+        }
+    }
+
 }
