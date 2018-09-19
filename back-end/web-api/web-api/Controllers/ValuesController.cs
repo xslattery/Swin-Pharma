@@ -263,7 +263,7 @@ namespace web_api.Controllers
             itemTableLock.ReleaseMutex();
 
             // If the item does not exist return a not found.
-            if (!foundItem) return NotFound();
+            if (!foundItem) return StatusCode(400);
             return Ok();
         }
 
@@ -303,7 +303,7 @@ namespace web_api.Controllers
                     itemTableLock.ReleaseMutex();
 
                     // If the item does not exist return a not found.
-                    if (!foundItem) return NotFound();
+                    if (!foundItem) return StatusCode(400);
 
                     return Ok();
                 }
@@ -352,6 +352,27 @@ namespace web_api.Controllers
 
         [Required]
         public bool LastInGroup { get; set; }
+    }
+
+    public class SaleUpdateRecieve
+    {
+        [Key]
+        [Required]
+        public int GroupID { get; set; }
+
+        [Required]
+        public int ItemID { get; set; }
+
+        [Required]
+        public int Quantity { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        public string Date { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        public string Time { get; set; }
     }
 
     public class SalePostRecieveGroup
@@ -494,15 +515,17 @@ namespace web_api.Controllers
                         Sale sale = new Sale(salesTable.Count + 1, item.GroupID, item.ItemID, item.Quantity, item.Date, item.Time);
                         salesTable.Add(sale);
 
-                        if (!InventoryController.itemTableLoadedFromFile) 
-                            InventoryController temp = new InventoryController();
+                        if (!InventoryController.itemTableLoadedFromFile)
+                        {
+                            InventoryController c = new InventoryController();
+                        } 
 
                         InventoryController.itemTableLock.WaitOne();
                         foreach (var inven in InventoryController.itemTable)
                         {
-                            if (inven.id == item.id) 
+                            if (inven.id == sale.itemID) 
                             {
-                                inven.quantity -= item.quantity;
+                                inven.quantity -= sale.quantity;
                                 break;
                             }
                         }
@@ -515,9 +538,7 @@ namespace web_api.Controllers
                         file.Close();
                         InventoryController.itemTableLock.ReleaseMutex();
 
-                        // NOTE(Xavier): It is probably not the best idea to do this here
-                        // because it will be called for each complete group to be added.
-                        var file = new StreamWriter(salesDatabaseFile);
+                        file = new StreamWriter(salesDatabaseFile);
                         foreach (var entry in salesTable)
                         {
                             file.WriteLine(entry);
@@ -537,7 +558,7 @@ namespace web_api.Controllers
         {
             if (model != null)
             {
-                if (model.date != null && model.time != null) 
+                if (model.Date != null && model.Time != null) 
                 {
                     try
                     {
@@ -623,6 +644,80 @@ namespace web_api.Controllers
             salesTableLock.ReleaseMutex();
 
             return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, SaleUpdateRecieve model)
+        {
+            if (model != null)
+            {
+                try
+                {
+                    System.Diagnostics.Debug.WriteLine("########## PUT ID Inventory " + id.ToString());
+                    Console.WriteLine("########## PUT ID Inventory " + id.ToString());
+
+                    Sale newSale = new Sale(id, model.GroupID, model.ItemID, model.Quantity, model.Date, model.Time);
+
+                    // Check to see if the item exists
+                    bool found = false;
+                    salesTableLock.WaitOne();
+                    for (int i = 0; i < salesTable.Count; i++)
+                    {
+                        // If item is found, replace with updated data
+                        if (salesTable[i].id == id)
+                        {
+                            if (!InventoryController.itemTableLoadedFromFile)
+                            {
+                                InventoryController c = new InventoryController();
+                            }
+
+                            InventoryController.itemTableLock.WaitOne();
+                            foreach (var inven in InventoryController.itemTable)
+                            {
+                                if (inven.id == salesTable[i].itemID)
+                                {
+                                    found = true;
+                                    inven.quantity += salesTable[i].quantity;
+                                    salesTable[i] = newSale;
+                                    inven.quantity -= salesTable[i].quantity;
+                                    break;
+                                }
+                            }
+
+                            var invFile = new StreamWriter(InventoryController.inventoryDatabaseFile);
+                            foreach (var entry in InventoryController.itemTable)
+                            {
+                                invFile.WriteLine(entry);
+                            }
+                            invFile.Close();
+                            InventoryController.itemTableLock.ReleaseMutex();
+                            break;
+                        }
+                    }
+
+                    // Save File
+                    var file = new StreamWriter(salesDatabaseFile);
+                    foreach (var entry in salesTable)
+                    {
+                        file.WriteLine(entry);
+                    }
+                    file.Close();
+                    salesTableLock.ReleaseMutex();
+
+                    // If the item does not exist return a not found.
+                    if (!found) return StatusCode(400);
+
+                    return Ok();
+                }
+                catch (Exception)
+                {
+                    // Internal Error
+                    return StatusCode(500);
+                }
+            }
+
+            // 400 - Failure
+            return StatusCode(400);
         }
     }
 
