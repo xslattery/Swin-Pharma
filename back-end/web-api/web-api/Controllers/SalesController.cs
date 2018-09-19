@@ -334,6 +334,63 @@ namespace web_api.Controllers
             return Ok(result);
         }
 
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+
+            System.Diagnostics.Debug.WriteLine("########## DELETE ID Sale " + id.ToString());
+            Console.WriteLine("########## DELETE ID Sale " + id.ToString());
+
+            // Remove the item if it exists
+            bool foundSale = false;
+            salesTableLock.WaitOne();
+            foreach (var line in salesTable)
+            {
+                if (line.id == id)
+                {
+                    foundSale = true;
+
+                    if (!InventoryController.itemTableLoadedFromFile)
+                    {
+                        InventoryController c = new InventoryController();
+                    }
+
+                    InventoryController.itemTableLock.WaitOne();
+                    foreach (var inven in InventoryController.itemTable)
+                    {
+                        if (inven.id == line.itemID)
+                        {
+                            inven.quantity += line.quantity;
+                            break;
+                        }
+                    }
+
+                    var invFile = new StreamWriter(InventoryController.inventoryDatabaseFile);
+                    foreach (var entry in InventoryController.itemTable)
+                    {
+                        invFile.WriteLine(entry);
+                    }
+                    invFile.Close();
+                    InventoryController.itemTableLock.ReleaseMutex();
+
+                    salesTable.Remove(line);
+                    break;
+                }
+            }
+
+            var file = new StreamWriter(salesDatabaseFile);
+            foreach (var entry in salesTable)
+            {
+                file.WriteLine(entry);
+            }
+            file.Close();
+            salesTableLock.ReleaseMutex();
+
+            // If the sale does not exist return a not found.
+            if (!foundSale) return StatusCode(400);
+            return Ok();
+        }
+
         [HttpPut("{id}")]
         public IActionResult Update(int id, SaleUpdateRecieve model)
         {
