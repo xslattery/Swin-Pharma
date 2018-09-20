@@ -239,7 +239,9 @@ class SalesPage extends Component {
                     : "Montly"}{" "}
                   Sales Report For {this.props.reportData.reportDate}
                 </ViewHeading>
-                <ViewFrame padding={0}>{this.getTable()}</ViewFrame>
+                <ViewFrame padding={0} overflowX="auto">
+                  {this.getTable()}
+                </ViewFrame>
               </React.Fragment>
             );
           } else {

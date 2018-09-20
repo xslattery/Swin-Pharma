@@ -6,7 +6,10 @@ class ViewFrame extends Component {
   render() {
     return (
       <Paper
-        style={{ padding: this.props.padding + "rem", overflowX: "auto" }}
+        style={{
+          padding: this.props.padding + "rem",
+          overflowX: this.props.overflowX || "visible"
+        }}
         className="gl-frame"
       >
         {this.props.children}
