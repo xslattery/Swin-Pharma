@@ -15,6 +15,13 @@ const updateSales = sales => {
   };
 };
 
+const updateReportData = reportData => {
+  return {
+    type: "LOAD_FETCHED_REPORT_DATA",
+    payload: reportData
+  };
+};
+
 const addAppProcessToStack = () => {
   return {
     type: "ADD_APP_PROCESS_TO_STACK"
@@ -79,5 +86,26 @@ export const fetchSales = () => {
       dispatch(updateSales(sales));
       dispatch(removeAppProcessFromStack());
     });
+  };
+};
+
+export const fetchReportData = (type, date) => {
+  return dispatch => {
+    dispatch(addAppProcessToStack());
+    date = date.split("-");
+    date = date[2] + "/" + date[1] + "/" + date[0];
+    axios
+      .get(appConfig.serverRoot + "api/Report/" + type + "?date=" + date)
+      .then(res => {
+        var rows = type == "Week" ? res.data.row : res.data.rows;
+        var reportData = {
+          rows,
+          reportType: type,
+          reportDate: date
+        };
+        console.log(reportData);
+        dispatch(updateReportData(reportData));
+        dispatch(removeAppProcessFromStack());
+      });
   };
 };

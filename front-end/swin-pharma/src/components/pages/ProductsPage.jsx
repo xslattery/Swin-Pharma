@@ -7,13 +7,13 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
-import Input from "@material-ui/core/Input";
-import FormControl from "@material-ui/core/FormControl";
 import TableRow from "@material-ui/core/TableRow";
-import Button from "@material-ui/core/Button";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/Add";
 import Grid from "@material-ui/core/Grid";
+import Input from "@material-ui/core/Input";
+import FormControl from "@material-ui/core/FormControl";
 import { connect } from "react-redux";
 import appConfig from "../../scripts/config";
 import axios from "axios";
@@ -244,9 +244,7 @@ class ProductsPage extends Component {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell numeric>
-                  {resolveFieldDisplayName("productCode")}
-                </TableCell>
+                <TableCell numeric>{resolveFieldDisplayName("id")}</TableCell>
                 <TableCell>{resolveFieldDisplayName("brand")}</TableCell>
                 <TableCell>{resolveFieldDisplayName("name")}</TableCell>
                 <TableCell>{resolveFieldDisplayName("barcode")}</TableCell>

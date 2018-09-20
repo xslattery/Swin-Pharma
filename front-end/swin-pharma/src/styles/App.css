@@ -1,13 +1,26 @@
 /* MODIFIERS */
 
-.no-padding{padding:0;}
-.no-margin{margin:0;}
+.no-padding {
+  padding: 0;
+}
+.no-margin {
+  margin: 0;
+}
 
-.covert-link{text-decoration:none;color:inherit;}
+.covert-link {
+  text-decoration: none;
+  color: inherit;
+}
 
-.left-icon { margin-right: 6px; }
-.right-icon { margin-left: 6px; }
-.icon-small { font-size: 20px; }
+.left-icon {
+  margin-right: 6px;
+}
+.right-icon {
+  margin-left: 6px;
+}
+.icon-small {
+  font-size: 20px;
+}
 
 /* GLOBAL */
 
@@ -16,93 +29,93 @@ body {
   padding: 0;
   font-family: sans-serif;
   background-color: #eee;
-  font-family: 'Lato', sans-serif;
+  font-family: "Lato", sans-serif;
   font-weight: 600;
 }
 
-.root{
-  font-family: 'Lato', sans-serif;
+.root {
+  font-family: "Lato", sans-serif;
   font-weight: 600;
 }
 
-.gl-page{
-  width:123px;
+.gl-page {
+  width: 123px;
   background-color: #eee;
 }
 
-#gl-app-bar{
-  height:60px;
+#gl-app-bar {
+  height: 60px;
   border-bottom: 1px solid #e6e6e6;
   position: fixed;
 }
 
-#gl-app-bar-daemon{
-  height:60px;
-  background-color:aqua;
+#gl-app-bar-daemon {
+  height: 60px;
+  background-color: aqua;
 }
 
-#gl-main-menu{
-  width:240px;
-  height:100vh;
-  flex-grow:1;
-  margin-top:60px;
+#gl-main-menu {
+  width: 240px;
+  height: 100vh;
+  flex-grow: 1;
+  margin-top: 60px;
   position: fixed;
   box-sizing: border-box;
   background-color: #f5f5f5;
-  border-right:1px solid #e3e3e3;
+  border-right: 1px solid #e3e3e3;
 }
 
-#gl-main-menu-daemon{
-  width:230px;
+#gl-main-menu-daemon {
+  width: 230px;
   background-color: red;
 }
 
-#gl-main-logo{
+#gl-main-logo {
   font-size: 2rem;
-  padding-bottom:5px;
-  font-family: 'Crete Round', serif;
+  padding-bottom: 10px;
+  font-family: "Crete Round", serif;
 }
 
-#gl-main-logo-icon{
-  color:#EA2027;
+#gl-main-logo-icon {
+  color: #ea2027;
   font-size: 1.5rem;
   position: relative;
   bottom: 0.1rem;
-  margin-right:0.5rem;
+  margin-right: 0.5rem;
 }
 
-#gl-main-logo-start{
-  color:#EA2027;
+#gl-main-logo-start {
+  color: #ea2027;
 }
 
-#gl-main-logo-end{
-  color:#1289A7;
+#gl-main-logo-end {
+  color: #1289a7;
 }
 
-.gl-frame{
+.gl-frame {
   margin: 1rem 2rem 2rem 2rem;
 }
 
-.gl-heading{
+.gl-heading {
   margin: 2rem 2rem 0 2rem;
 }
 
-.editable-field{
+.editable-field {
   text-decoration: none;
-  margin-right:1.3rem;
-  color:inherit;
+  margin-right: 1.3rem;
+  color: inherit;
 }
 
-.editable-field-icon{
+.editable-field-icon {
   display: none;
-  margin-left:0.5rem;
+  margin-left: 0.5rem;
 }
 
-.editable-field:hover{
+.editable-field:hover {
   text-decoration: underline;
   margin-right: 0;
 }
 
-.editable-field:hover > .editable-field-icon{
+.editable-field:hover > .editable-field-icon {
   display: inline-block;
 }
