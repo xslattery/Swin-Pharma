@@ -125,6 +125,7 @@ namespace web_api.Controllers
         public static Mutex salesTableLock = new Mutex();
         public static bool salesTableLoadedFromFile = false;
         public static List<Sale> salesTable = new List<Sale>();
+        private static int nextSaleID = 1;
 
         public static int nextGroup;
         public static Mutex nextGroupLock = new Mutex();
@@ -159,6 +160,8 @@ namespace web_api.Controllers
                             nextGroupLock.WaitOne();
                             if (sale.groupID > nextGroup)
                                 nextGroup = sale.groupID + 1;
+                            if (sale.id > nextSaleID)
+                                nextSaleID = sale.id + 1;
                             nextGroupLock.ReleaseMutex();
 
                             salesTableLock.ReleaseMutex();
@@ -200,7 +203,7 @@ namespace web_api.Controllers
                     salesTableLock.WaitOne();
                     foreach (var item in group.sales)
                     {
-                        Sale sale = new Sale(salesTable.Count + 1, item.GroupID, item.ItemID, item.Quantity, item.Date, item.Time);
+                        Sale sale = new Sale(nextSaleID++, item.GroupID, item.ItemID, item.Quantity, item.Date, item.Time);
                         salesTable.Add(sale);
 
                         if (!InventoryController.itemTableLoadedFromFile)
