@@ -318,19 +318,40 @@ namespace web_api.Controllers
             return Ok(result);
         }
 
+        //
+        // DEPRECATED
+        //
         // Used for getting all sales items:
+        //[HttpGet]
+        //[ProducesResponseType(200, Type = typeof(IEnumerable<string>))]
+        //public IActionResult Get()
+        //{
+        //    System.Diagnostics.Debug.WriteLine("########## GET Sales");
+        //    Console.WriteLine("########## GET Sales");
+
+        //    salesTableLock.WaitOne();
+        //    List<string> result = new List<string>();
+        //    foreach (var entry in salesTable)
+        //    {
+        //        result.Add(entry.ToString());
+        //    }
+        //    salesTableLock.ReleaseMutex();
+
+        //    return Ok(result);
+        //}
+
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(IEnumerable<string>))]
-        public IActionResult Get()
+        public IActionResult GetSelection([FromQuery(Name = "start")] int start, [FromQuery(Name = "count")] int count)
         {
-            System.Diagnostics.Debug.WriteLine("########## GET Sales");
-            Console.WriteLine("########## GET Sales");
+            System.Diagnostics.Debug.WriteLine("########## GET SELECTION Sales");
+            Console.WriteLine("########## GET SELECTION Sales");
 
             salesTableLock.WaitOne();
             List<string> result = new List<string>();
-            foreach (var entry in salesTable)
+            for (int i = salesTable.Count - 1 - start; i >= salesTable.Count - count - start && i >= 0; i--)
             {
-                result.Add(entry.ToString());
+                result.Add(salesTable[i].ToString());
             }
             salesTableLock.ReleaseMutex();
 
