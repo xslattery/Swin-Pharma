@@ -15,7 +15,7 @@ namespace web_api.Controllers
     {
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(string))]
-        public IActionResult Get([FromQuery(Name = "ammount")] int ammount)
+        public IActionResult Get([FromQuery(Name = "amount")] int amount)
         {
             System.Diagnostics.Debug.WriteLine("########## GET Notifications");
             Console.WriteLine("########## GET Notifications");
@@ -31,7 +31,7 @@ namespace web_api.Controllers
             InventoryController.itemTableLock.WaitOne();
             foreach (var item in InventoryController.itemTable)
             {
-                if (item.quantity < ammount)
+                if (item.quantity < amount)
                 {
                     result += "{";
 
