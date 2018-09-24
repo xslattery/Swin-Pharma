@@ -45,6 +45,7 @@ namespace web_api.Controllers
                 string result = "{";
                 result += "\"row\": [";
 
+                InventoryController.itemTableLock.WaitOne();
                 foreach (var item in InventoryController.itemTable)
                 {
                     result += "{";
@@ -78,6 +79,7 @@ namespace web_api.Controllers
 
                     result += "},";
                 }
+                InventoryController.itemTableLock.ReleaseMutex();
                 result = result.Remove(result.Length - 1);
 
                 result += "]";
