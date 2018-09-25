@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -93,7 +94,21 @@ namespace web_api.Controllers
 
 
 
+        [HttpGet]
+        [Route("Week/report.csv")]
+        [Produces("text/csv")]
+        [ProducesResponseType(200, Type = typeof(FileContentResult))]
+        public IActionResult GetWeekCSV([FromQuery(Name = "date")] string date)
+        {
+            System.Diagnostics.Debug.WriteLine("########## REPORT WEEK GET CSV Inventory");
+            Console.WriteLine("########## REPORT WEEK GET CSV Inventory");
 
+            Byte[] byteArray = Encoding.UTF8.GetBytes("This is the contents of the file.");
+
+            var result = new FileContentResult(byteArray, "application/octet-stream");
+            result.FileDownloadName = "weekly-report.csv";
+            return result;
+        }
 
 
 
