@@ -27,9 +27,31 @@ class MainMenu extends Component {
       }
     }, 200);
   }
-  getAlertsBadge() {
+  getAlertsListItem() {
     if (this.props.alerts.length > 0) {
-      return <Badge badgeContent={this.props.alerts.length} color="error" />;
+      return (
+        <Link className="covert-link" to="/alerts">
+          <ListItem button selected={this.state.currentPage === "/alerts"}>
+            <ListItemIcon>
+              <Badge color="error" badgeContent={this.props.alerts.length}>
+                <NotificationsIcon />
+              </Badge>
+            </ListItemIcon>
+            <ListItemText primary="Alerts" />
+          </ListItem>
+        </Link>
+      );
+    } else {
+      return (
+        <Link className="covert-link" to="/alerts">
+          <ListItem button selected={this.state.currentPage === "/alerts"}>
+            <ListItemIcon>
+              <NotificationsIcon />
+            </ListItemIcon>
+            <ListItemText primary="Alerts" />
+          </ListItem>
+        </Link>
+      );
     }
   }
   render() {
@@ -64,15 +86,7 @@ class MainMenu extends Component {
                 <ListItemText primary="Reports" />
               </ListItem>
             </Link>
-            <Link className="covert-link" to="/alerts">
-              <ListItem button selected={this.state.currentPage === "/alerts"}>
-                <ListItemIcon>
-                  <NotificationsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Alerts" />
-                {this.getAlertsBadge()}
-              </ListItem>
-            </Link>
+            {this.getAlertsListItem()}
           </List>
           <Divider />
           <List component="nav">
