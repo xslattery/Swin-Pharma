@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
-import '../styles/App.css';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import { MuiThemeProvider } from '@material-ui/core/styles';
-import theme from '../scripts/muiTheme';
-import MainLayout from './global/MainLayout.jsx';
-import { BrowserRouter } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { fetchProducts, fetchSales } from '../actions/index';
-import { bindActionCreators } from 'redux';
+import React, { Component } from "react";
+import "../styles/App.css";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import { MuiThemeProvider } from "@material-ui/core/styles";
+import theme from "../scripts/muiTheme";
+import MainLayout from "./global/MainLayout.jsx";
+import { BrowserRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import { fetchProducts, fetchSales, fetchAlerts } from "../actions/index";
+import { bindActionCreators } from "redux";
+import { withRouter } from "react-router-dom";
 
 class App extends Component {
   constructor(props) {
@@ -18,23 +19,23 @@ class App extends Component {
   componentDidMount() {
     this.start(10);
   }
-  start(syncIntervalTime) {
+  start(syncIntervalTime /* time in seconds */) {
     this.sync();
-    //var syncIntervalHandle = 
     window.setInterval(this.sync, syncIntervalTime * 1000);
   }
   sync() {
     this.props.fetchProducts();
     this.props.fetchSales();
+    this.props.fetchAlerts();
   }
   render() {
     return (
       <BrowserRouter>
         <MuiThemeProvider theme={theme}>
           <CssBaseline />
-          <div className="App" >
+          <div className="App">
             <MainLayout />
-          </div >
+          </div>
         </MuiThemeProvider>
       </BrowserRouter>
     );
@@ -42,11 +43,15 @@ class App extends Component {
 }
 
 const mapDispatchToProps = dispatch => {
-  return bindActionCreators({
-    fetchProducts,
-    fetchSales
-  }, dispatch);
-}
+  return bindActionCreators(
+    {
+      fetchProducts,
+      fetchSales,
+      fetchAlerts
+    },
+    dispatch
+  );
+};
 
 export default connect(
   null,

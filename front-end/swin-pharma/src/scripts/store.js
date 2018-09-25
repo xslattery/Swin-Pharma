@@ -22,6 +22,9 @@ export default () => {
       rows: [],
       reportType: "Week",
       reportDate: "NULL"
+    },
+    alerts: {
+      data: []
     }
   };
   return createStore(rootReducer, initialState, composedEnhancers);

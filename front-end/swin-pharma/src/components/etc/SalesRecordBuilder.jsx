@@ -41,7 +41,7 @@ class SalesRecordBuilder extends Component {
   rowWithIdExists(target) {
     var found = false;
     for (var i = 0; i < this.state.rows.length; i++) {
-      if (this.state.rows[i].itemId == target) {
+      if (this.state.rows[i].itemId === target) {
         found = true;
         break;
       }

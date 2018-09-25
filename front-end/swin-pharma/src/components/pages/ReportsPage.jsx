@@ -8,21 +8,16 @@ import ViewHeading from "../global/ViewHeading";
 import TableRow from "@material-ui/core/TableRow";
 import { connect } from "react-redux";
 import Grid from "@material-ui/core/Grid";
-import Input from "@material-ui/core/Input";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import Button from "@material-ui/core/Button";
 import SyncIcon from "@material-ui/icons/Sync";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import ordinalOf from "../../scripts/monthOrdinals";
-import {
-  updateReportType,
-  updateReportDate,
-  fetchReportData
-} from "../../actions/index.js";
+import { fetchReportData } from "../../actions/index.js";
 import { bindActionCreators } from "redux";
 
 class SalesPage extends Component {
@@ -209,7 +204,7 @@ class SalesPage extends Component {
                   if (
                     document
                       .getElementById("0QNXJD43O3")
-                      .value.match(/^[0-9]{2,4}\-[0-9]{1,2}\-[0-9]{1,2}$/)
+                      .value.match(/^[0-9]{2,4}-[0-9]{1,2}-[0-9]{1,2}$/)
                   ) {
                     this.props.fetchReportData(
                       this.state.type,
@@ -225,6 +220,21 @@ class SalesPage extends Component {
               >
                 <SyncIcon className="left-icon icon-small" />
                 Get Report
+              </Button>
+              <span style={{ width: "1rem", display: "inline-block" }} />
+              <Button
+                onClick={() => {
+                  var dummyIframe = document.createElement("iframe");
+                  document.body.appendChild(dummyIframe);
+                  dummyIframe.src =
+                    "http://localhost:5001/api/Report/Week/report.csv?date=7/7/2018";
+                }}
+                variant="contained"
+                size="small"
+                color="primary"
+              >
+                <CloudDownloadIcon className="left-icon icon-small" />
+                Export CSV
               </Button>
             </Grid>
           </Grid>

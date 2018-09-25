@@ -1,73 +1,44 @@
-import React, { Component } from 'react';
-import ViewFrame from '../global/ViewFrame.jsx';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import ViewHeading from '../global/ViewHeading';
-import TableRow from '@material-ui/core/TableRow';
-import { connect } from 'react-redux';
+import React, { Component } from "react";
+import ViewFrame from "../global/ViewFrame.jsx";
+import ViewHeading from "../global/ViewHeading";
+import { connect } from "react-redux";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
 
-let id = 0;
-function createData(name, calories, fat, carbs, protein) {
-    id += 1;
-    return { id, name, calories, fat, carbs, protein };
+class AlertsPage extends Component {
+  render() {
+    return (
+      <React.Fragment>
+        <ViewHeading variant="title">Alerts</ViewHeading>
+        <ViewFrame padding={0}>
+          <List>
+            {this.props.alerts.map((alert, i) => (
+              <ListItem key={i} dense>
+                <ListItemText>
+                  <span style={{ color: "#FFC107" }}>Low Stock!</span>
+                  &nbsp; You only have <b>{alert.quantity}</b> items in stock
+                  for
+                  <b>'{alert.name}'</b>
+                </ListItemText>
+                <IconButton>
+                  <CloseIcon />
+                </IconButton>
+              </ListItem>
+            ))}
+          </List>
+        </ViewFrame>
+      </React.Fragment>
+    );
+  }
 }
 
-const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
+const mapStateToProps = function(state) {
+  return {
+    alerts: state.alerts.data
+  };
+};
 
-class SalesPage extends Component {
-    render() {
-        return (
-            <React.Fragment>
-                <ViewHeading variant="title">
-                    Alerts
-                </ViewHeading>
-                <ViewFrame padding={0}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Dessert (100g serving)</TableCell>
-                                <TableCell numeric>Calories</TableCell>
-                                <TableCell numeric>Fat (g)</TableCell>
-                                <TableCell numeric>Carbs (g)</TableCell>
-                                <TableCell numeric>Protein (g)</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rows.map(row => {
-                                return (
-                                    <TableRow key={row.id}>
-                                        <TableCell component="th" scope="row">
-                                            {row.name}
-                                        </TableCell>
-                                        <TableCell numeric>{row.calories}</TableCell>
-                                        <TableCell numeric>{row.fat}</TableCell>
-                                        <TableCell numeric>{row.carbs}</TableCell>
-                                        <TableCell numeric>{row.protein}</TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </ViewFrame>
-            </React.Fragment>
-        );
-    }
-}
-
-const mapStateToProps = function (state) {
-    return {
-        test: state.test,
-    }
-}
-
-export default connect(
-    mapStateToProps
-)(SalesPage);
+export default connect(mapStateToProps)(AlertsPage);

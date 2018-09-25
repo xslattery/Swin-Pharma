@@ -33,7 +33,7 @@ function resolveFieldDisplayName(fieldName) {
     time: "Time"
   };
   for (var d in definitions) {
-    if (d == fieldName) return definitions[d];
+    if (d === fieldName) return definitions[d];
   }
   return fieldName;
 }
@@ -184,7 +184,7 @@ class SalesPage extends Component {
                     <TableCell numeric>
                       {this.EditableField(thisRow.time, saleId, "time")}
                     </TableCell>
-                    <TableCell numeric>{this.deleteButton(saleId)}</TableCell>
+                    <TableCell numeric>{this.deleteButton(saleId)} </TableCell>
                   </TableRow>
                 );
               })}

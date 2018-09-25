@@ -22,6 +22,13 @@ const updateReportData = reportData => {
   };
 };
 
+const updateAlerts = alerts => {
+  return {
+    type: "LOAD_FETCHED_ALERTS",
+    payload: alerts
+  };
+};
+
 const addAppProcessToStack = () => {
   return {
     type: "ADD_APP_PROCESS_TO_STACK"
@@ -97,15 +104,24 @@ export const fetchReportData = (type, date) => {
     axios
       .get(appConfig.serverRoot + "api/Report/" + type + "?date=" + date)
       .then(res => {
-        var rows = type == "Week" ? res.data.row : res.data.rows;
+        var rows = type === "Week" ? res.data.row : res.data.rows;
         var reportData = {
           rows,
           reportType: type,
           reportDate: date
         };
-        console.log(reportData);
         dispatch(updateReportData(reportData));
         dispatch(removeAppProcessFromStack());
       });
+  };
+};
+
+export const fetchAlerts = () => {
+  return dispatch => {
+    dispatch(addAppProcessToStack());
+    axios.get(appConfig.serverRoot + "api/Notification?amount=5").then(res => {
+      dispatch(updateAlerts(res.data.items));
+      dispatch(removeAppProcessFromStack());
+    });
   };
 };

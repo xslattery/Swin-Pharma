@@ -40,7 +40,7 @@ function resolveFieldDisplayName(fieldName) {
     quantity: "Stock Level"
   };
   for (var d in definitions) {
-    if (d == fieldName) return definitions[d];
+    if (d === fieldName) return definitions[d];
   }
   return fieldName;
 }
@@ -80,15 +80,14 @@ class ProductsPage extends Component {
   }
   getProductById(id) {
     for (var p in this.props.products.data) {
-      if (p == id) return this.props.products.data[p];
+      if (p === id) return this.props.products.data[p];
     }
     return "";
   }
   EditableField(text, productCode, fieldName) {
     return (
-      <a
+      <span
         className="editable-field"
-        href="#"
         onClick={() => {
           this.setState({
             showingEditDialogue: true,
@@ -102,7 +101,7 @@ class ProductsPage extends Component {
         <span className="editable-field-icon">
           <EditIcon fontSize="inherit" />
         </span>
-      </a>
+      </span>
     );
   }
   closeEditDialogue = () => {

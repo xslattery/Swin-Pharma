@@ -104,6 +104,7 @@ body {
   text-decoration: none;
   margin-right: 1.3rem;
   color: inherit;
+  cursor: pointer;
 }
 
 .editable-field-icon {
@@ -118,4 +119,8 @@ body {
 
 .editable-field:hover > .editable-field-icon {
   display: inline-block;
+}
+
+#gl-main-menu .active {
+  color: red;
 }
