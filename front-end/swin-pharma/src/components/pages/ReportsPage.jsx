@@ -19,13 +19,14 @@ import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import ordinalOf from "../../scripts/monthOrdinals";
 import { fetchReportData } from "../../actions/index.js";
 import { bindActionCreators } from "redux";
+import config from "../../scripts/config";
 
 class SalesPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       type: "Month",
-      date: "//"
+      date: "00/00/0000"
     };
   }
   getTableHead() {
@@ -225,9 +226,16 @@ class SalesPage extends Component {
               <Button
                 onClick={() => {
                   var dummyIframe = document.createElement("iframe");
+                  dummyIframe.style.display = "none";
+                  dummyIframe.style.width = "0px";
+                  dummyIframe.style.height = "0px";
                   document.body.appendChild(dummyIframe);
                   dummyIframe.src =
-                    "http://localhost:5001/api/Report/Week/report.csv?date=7/7/2018";
+                    config.serverRoot +
+                    "api/Report/" +
+                    this.props.reportData.reportType +
+                    "/report.csv?date=" +
+                    this.state.date;
                 }}
                 variant="contained"
                 size="small"
