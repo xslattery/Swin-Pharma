@@ -168,7 +168,7 @@ namespace web_api.Controllers
         }
 
 
-        // Generating the monthly report:
+        // Generating the monthly CSV report:
         [HttpGet]
         [Route("Month/")]
         [ProducesResponseType(200, Type = typeof(string))]
@@ -245,5 +245,85 @@ namespace web_api.Controllers
 
             return StatusCode(400);
         }
+
+
+        [HttpGet]
+        [Route("Month/report.csv")]
+        [Produces("text/csv")]
+        [ProducesResponseType(200, Type = typeof(FileContentResult))]
+        public IActionResult GetMonthCSV([FromQuery(Name = "date")] string date)
+        {
+            System.Diagnostics.Debug.WriteLine("########## REPORT MONTH GET CSV Inventory");
+            Console.WriteLine("########## REPORT MONTH GET CSV Inventory");
+
+            string result = "Item, ";
+
+            DateTime startDate;
+            if (DateTime.TryParse(date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out startDate))
+            {
+                if (!InventoryController.itemTableLoadedFromFile)
+                {
+                    InventoryController c = new InventoryController();
+                }
+
+                if (!SalesController.salesTableLoadedFromFile)
+                {
+                    SalesController sc = new SalesController();
+                }
+
+                int dayOffset = (int)startDate.Day - 1;
+                startDate = startDate.AddDays(-dayOffset);
+
+                for (int i = 0; i < DateTime.DaysInMonth(startDate.Year, startDate.Month); i++)
+                {
+                    result += (i + 1) + ",";
+                }
+                result = result.Remove(result.Length - 1);
+                result += "\n";
+
+                foreach (var item in InventoryController.itemTable)
+                {
+                    result += item.name + ",";
+
+                    for (int i = 0; i < DateTime.DaysInMonth(startDate.Year, startDate.Month); i++)
+                    {
+
+                        double proffit = 0;
+                        DateTime currentDate = startDate.AddDays(i);
+
+                        SalesController.salesTableLock.WaitOne();
+                        foreach (var sale in SalesController.salesTable)
+                        {
+                            if (item.id == sale.itemID)
+                            {
+                                DateTime compareDate;
+                                if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out compareDate))
+                                {
+                                    if (compareDate == currentDate)
+                                    {
+                                        proffit += Double.Parse(item.purchasePrice) * sale.quantity;
+                                    }
+                                }
+                            }
+                        }
+                        SalesController.salesTableLock.ReleaseMutex();
+
+                        result += proffit + ",";
+                    }
+                    result = result.Remove(result.Length - 1);
+
+                    result += "\n";
+                }
+                result = result.Remove(result.Length - 1);
+            }
+
+            Byte[] byteArray = Encoding.UTF8.GetBytes(result);
+
+            var fileResult = new FileContentResult(byteArray, "application/octet-stream");
+            fileResult.FileDownloadName = "monthly-report.csv";
+
+            return fileResult;
+        }
+
     }
 }
