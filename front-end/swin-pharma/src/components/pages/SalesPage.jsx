@@ -13,14 +13,14 @@ import appConfig from "../../scripts/config";
 import axios from "axios";
 import SalesRecordBuilder from "../etc/SalesRecordBuilder";
 import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
+import DeleteIcon from "@material-ui/icons/DeleteTwoTone";
 import {
   fetchSales,
   updateSalesRowsPerPage,
   salesChangePage
 } from "../../actions/index";
 import { bindActionCreators } from "redux";
-import EditIcon from "@material-ui/icons/Edit";
+import EditIcon from "@material-ui/icons/EditTwoTone";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";

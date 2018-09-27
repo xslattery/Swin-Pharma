@@ -1,147 +1,105 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import Divider from "@material-ui/core/Divider";
-import BubbleChartIcon from "@material-ui/icons/BubbleChart";
-import BarChartIcon from "@material-ui/icons/BarChart";
-import WidgetsIcon from "@material-ui/icons/Widgets";
-import NotificationsIcon from "@material-ui/icons/Notifications";
-import SettingsIcon from "@material-ui/icons/Settings";
+import BubbleChartIcon from "@material-ui/icons/BubbleChartTwoTone";
+import BarChartIcon from "@material-ui/icons/BarChartTwoTone";
+import WidgetsIcon from "@material-ui/icons/WidgetsTwoTone";
+import NotificationsIcon from "@material-ui/icons/NotificationsTwoTone";
+import SettingsIcon from "@material-ui/icons/SettingsTwoTone";
 import Badge from "@material-ui/core/Badge";
+
+const primaryNavItems = [
+  { display: "Sales", path: "/sales", icon: BubbleChartIcon },
+  { display: "Products", path: "/products", icon: WidgetsIcon },
+  { display: "Reports", path: "/reports", icon: BarChartIcon },
+  {
+    display: "Alerts",
+    path: "/alerts",
+    icon: null,
+    getIcon: getAlertsListItemIcon
+  }
+];
+
+const secondaryNavItems = [
+  { display: "Settings", path: "/settings", icon: SettingsIcon }
+];
+
+function getAlertsListItemIcon(alertsCount) {
+  if (alertsCount > 0) {
+    return (
+      <Badge color="error" badgeContent={alertsCount}>
+        <NotificationsIcon />
+      </Badge>
+    );
+  } else {
+    return <NotificationsIcon />;
+  }
+}
 
 class MainMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPage: window.location.pathname
+      path: window.location.pathname
     };
-    // window.setInterval(() => {
-    //   if (window.location.pathname !== this.state.currentPage) {
-    //     this.setState({
-    //       currentPage: window.location.pathname
-    //     });
-    //   }
-    // }, 200);
   }
-  handleClick(dest) {
+  handleNavItemClick(dest) {
     this.setState({
-      currentPage: dest
+      path: dest
     });
+    this.props.history.push(dest);
   }
-  getAlertsListItem() {
-    if (this.props.alerts.length > 0) {
-      return (
-        <Link
-          className="covert-link"
-          to="/alerts"
-          onClick={() => {
-            this.handleClick("/alerts");
-          }}
-        >
-          <ListItem button selected={this.state.currentPage === "/alerts"}>
-            <ListItemIcon>
-              <Badge color="error" badgeContent={this.props.alerts.length}>
-                <NotificationsIcon />
-              </Badge>
-            </ListItemIcon>
-            <ListItemText primary="Alerts" />
-          </ListItem>
-        </Link>
-      );
-    } else {
-      return (
-        <Link
-          className="covert-link"
-          to="/alerts"
-          onClick={() => {
-            this.handleClick("/alerts");
-          }}
-        >
-          <ListItem button selected={this.state.currentPage === "/alerts"}>
-            <ListItemIcon>
-              <NotificationsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Alerts" />
-          </ListItem>
-        </Link>
-      );
-    }
+  getNavItem(display, path, Icon, getIcon) {
+    return (
+      <ListItem
+        key={path}
+        button
+        className="covert-link"
+        onClick={() => {
+          this.handleNavItemClick(path);
+        }}
+        selected={path === this.state.path}
+      >
+        <ListItemIcon>
+          {typeof getIcon === "function" ? (
+            getIcon(this.props.alerts.length)
+          ) : (
+            <Icon />
+          )}
+        </ListItemIcon>
+        <ListItemText primary={display} />
+      </ListItem>
+    );
   }
   render() {
     return (
       <React.Fragment>
         <div id="gl-main-menu">
           <List component="nav">
-            <Link
-              className="covert-link"
-              to="/sales"
-              onClick={() => {
-                this.handleClick("/sales");
-              }}
-            >
-              <ListItem button selected={this.state.currentPage === "/sales"}>
-                <ListItemIcon>
-                  <BubbleChartIcon />
-                </ListItemIcon>
-                <ListItemText primary="Sales" />
-              </ListItem>
-            </Link>
-            <Link
-              className="covert-link"
-              to="/products"
-              onClick={() => {
-                this.handleClick("/products");
-              }}
-            >
-              <ListItem
-                button
-                selected={this.state.currentPage === "/products"}
-              >
-                <ListItemIcon>
-                  <WidgetsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Products" />
-              </ListItem>
-            </Link>
-            <Link
-              className="covert-link"
-              to="/reports"
-              onClick={() => {
-                this.handleClick("/reports");
-              }}
-            >
-              <ListItem button selected={this.state.currentPage === "/reports"}>
-                <ListItemIcon>
-                  <BarChartIcon />
-                </ListItemIcon>
-                <ListItemText primary="Reports" />
-              </ListItem>
-            </Link>
-            {this.getAlertsListItem()}
+            {primaryNavItems.map(n => {
+              return this.getNavItem(
+                n.display,
+                n.path,
+                n.icon,
+                typeof n.getIcon === "function" ? n.getIcon : null
+              );
+            })}
           </List>
           <Divider />
           <List component="nav">
-            <Link
-              className="covert-link"
-              to="/settings"
-              onClick={() => {
-                this.handleClick("/settings");
-              }}
-            >
-              <ListItem
-                button
-                selected={this.state.currentPage === "/settings"}
-              >
-                <ListItemIcon>
-                  <SettingsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Settings" />
-              </ListItem>
-            </Link>
+            {secondaryNavItems.map(n =>
+              this.getNavItem(
+                n.display,
+                n.path,
+                n.icon,
+                typeof n.getIcon === "function" ? n.getIcon : null
+              )
+            )}
           </List>
         </div>
         <div id="gl-main-menu-daemon" />
@@ -150,4 +108,6 @@ class MainMenu extends Component {
   }
 }
 
-export default connect(state => ({ alerts: state.alerts.data }))(MainMenu);
+export default connect(state => ({ alerts: state.alerts.data }))(
+  withRouter(MainMenu)
+);

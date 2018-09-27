@@ -6,8 +6,8 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
-import WarningIcon from "@material-ui/icons/Warning";
+import CloseIcon from "@material-ui/icons/CloseTwoTone";
+import WarningIcon from "@material-ui/icons/WarningTwoTone";
 
 class AlertsPage extends Component {
   render() {
