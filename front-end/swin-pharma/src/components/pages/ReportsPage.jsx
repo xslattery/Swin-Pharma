@@ -279,13 +279,9 @@ const mapDispatchToProps = dispatch => {
   );
 };
 
-const mapStateToProps = function(state) {
-  return {
-    reportData: state.reportData
-  };
-};
-
 export default connect(
-  mapStateToProps,
+  state => ({
+    reportData: state.reportData
+  }),
   mapDispatchToProps
 )(SalesPage);

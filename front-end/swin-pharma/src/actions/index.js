@@ -71,31 +71,47 @@ export const fetchProducts = () => {
 export const fetchSales = (startingIndex, rowsPerPage) => {
   return dispatch => {
     dispatch(addAppProcessToStack());
-    axios.get(appConfig.serverRoot + "api/Sales?start="+startingIndex+"&count="+rowsPerPage).then(res => {
-      var rows = res.data;
-      var sales = {
-        data: {},
-        index: [],
-        meta: {
-          startingIndex
-        }
-      };
-      for (var i = 0; i < rows.length; i++) {
-        var columns = rows[i].split(",");
-        sales.data[columns[0]] = {
-          groupId: columns[1],
-          itemId: columns[2],
-          quantity: columns[3],
-          date: columns[4],
-          time: columns[5],
-          numberInGroup: columns[6],
-          lastInGroup: columns[7]
-        };
-        sales.index[i] = columns[0];
-      }
-      dispatch(updateSales(sales));
+    axios.get(appConfig.serverRoot + "api/Sales/Count").then(res => {
+      dispatch({
+        type: "UPDATE_TOTAL_SALES_COUNT",
+        payload: res.data
+      });
       dispatch(removeAppProcessFromStack());
     });
+    dispatch(addAppProcessToStack());
+    axios
+      .get(
+        appConfig.serverRoot +
+          "api/Sales?start=" +
+          startingIndex +
+          "&count=" +
+          rowsPerPage
+      )
+      .then(res => {
+        var rows = res.data;
+        var sales = {
+          data: {},
+          index: [],
+          meta: {
+            startingIndex
+          }
+        };
+        for (var i = 0; i < rows.length; i++) {
+          var columns = rows[i].split(",");
+          sales.data[columns[0]] = {
+            groupId: columns[1],
+            itemId: columns[2],
+            quantity: columns[3],
+            date: columns[4],
+            time: columns[5],
+            numberInGroup: columns[6],
+            lastInGroup: columns[7]
+          };
+          sales.index[i] = columns[0];
+        }
+        dispatch(updateSales(sales));
+        dispatch(removeAppProcessFromStack());
+      });
   };
 };
 
@@ -128,3 +144,13 @@ export const fetchAlerts = () => {
     });
   };
 };
+
+export const updateSalesRowsPerPage = rowsPerPage => ({
+  type: "UPDATE_SALES_ROWS_PER_PAGE",
+  payload: rowsPerPage
+});
+
+export const salesChangePage = newPage => ({
+  type: "SALES_CHANGE_PAGE",
+  payload: newPage
+});

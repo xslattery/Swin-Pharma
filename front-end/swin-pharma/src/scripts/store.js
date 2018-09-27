@@ -18,9 +18,9 @@ export default () => {
       data: {},
       index: [],
       meta: {
-        total: 0,
+        totalSalesCount: 0,
         startingIndex: 0,
-        rowsPerPage: 30
+        rowsPerPage: 10
       }
     },
     reportData: {

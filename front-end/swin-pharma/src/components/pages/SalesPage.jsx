@@ -5,8 +5,8 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import TableFooter from '@material-ui/core/TableFooter';
-import TablePagination from '@material-ui/core/TablePagination';
+import TableFooter from "@material-ui/core/TableFooter";
+import TablePagination from "@material-ui/core/TablePagination";
 import ViewHeading from "../global/ViewHeading";
 import { connect } from "react-redux";
 import appConfig from "../../scripts/config";
@@ -14,7 +14,11 @@ import axios from "axios";
 import SalesRecordBuilder from "../etc/SalesRecordBuilder";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { fetchSales } from "../../actions/index";
+import {
+  fetchSales,
+  updateSalesRowsPerPage,
+  salesChangePage
+} from "../../actions/index";
 import { bindActionCreators } from "redux";
 import EditIcon from "@material-ui/icons/Edit";
 import Dialog from "@material-ui/core/Dialog";
@@ -61,7 +65,10 @@ class SalesPage extends Component {
               axios
                 .delete(appConfig.serverRoot + "api/Sales/" + saleId)
                 .then(res => {
-                  this.props.fetchSales(this.props.sales.meta.startingIndex, this.props.sales.meta.rowsPerPage);
+                  this.props.fetchSales(
+                    this.props.sales.meta.startingIndex,
+                    this.props.sales.meta.rowsPerPage
+                  );
                 });
             }
           };
@@ -111,7 +118,10 @@ class SalesPage extends Component {
       data: qs.stringify(data)
     })
       .then(() => {
-        this.props.fetchSales(this.props.sales.meta.startingIndex, this.props.sales.meta.rowsPerPage);
+        this.props.fetchSales(
+          this.props.sales.meta.startingIndex,
+          this.props.sales.meta.rowsPerPage
+        );
       })
       .catch(function(error) {
         alert("An unexpected error occurred while editing sales record.");
@@ -195,11 +205,26 @@ class SalesPage extends Component {
               <TableRow>
                 <TablePagination
                   colSpan={6}
-                  count={123}
+                  count={this.props.sales.meta.totalSalesCount}
                   rowsPerPage={this.props.sales.meta.rowsPerPage}
-                  page={this.props.sales.meta.startingIndex / this.props.sales.meta.rowsPerPage}
-                  onChangePage={() => { alert(0) }}
-                  onChangeRowsPerPage={() => { alert(0) }}
+                  page={
+                    this.props.sales.meta.startingIndex /
+                    this.props.sales.meta.rowsPerPage
+                  }
+                  onChangePage={(e, newPage) => {
+                    this.props.salesChangePage(newPage);
+                    this.props.fetchSales(
+                      newPage * this.props.sales.meta.rowsPerPage,
+                      this.props.sales.meta.rowsPerPage
+                    );
+                  }}
+                  onChangeRowsPerPage={e => {
+                    this.props.updateSalesRowsPerPage(e.target.value);
+                    this.props.fetchSales(
+                      this.props.sales.meta.startingIndex,
+                      e.target.value
+                    );
+                  }}
                 />
               </TableRow>
             </TableFooter>
@@ -260,7 +285,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return bindActionCreators(
     {
-      fetchSales: fetchSales
+      fetchSales,
+      updateSalesRowsPerPage,
+      salesChangePage
     },
     dispatch
   );
