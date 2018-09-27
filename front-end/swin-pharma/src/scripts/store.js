@@ -16,7 +16,8 @@ export default () => {
     },
     sales: {
       data: {},
-      index: []
+      index: [],
+      meta: []
     },
     reportData: {
       rows: [],
