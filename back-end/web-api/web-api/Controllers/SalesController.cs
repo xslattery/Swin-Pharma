@@ -320,8 +320,9 @@ namespace web_api.Controllers
 
         // Used for getting a single sales group:
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<string>))]
-        public IActionResult GeCount()
+        [Route("Count/")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<int>))]
+        public IActionResult GetCount()
         {
             System.Diagnostics.Debug.WriteLine("########## GET ID Sale");
             Console.WriteLine("########## GET ID Sale");
