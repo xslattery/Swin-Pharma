@@ -7,6 +7,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
+import WarningIcon from "@material-ui/icons/Warning";
 
 class AlertsPage extends Component {
   render() {
@@ -17,6 +18,7 @@ class AlertsPage extends Component {
           <List>
             {this.props.alerts.map((alert, i) => (
               <ListItem key={i} dense>
+                <WarningIcon />
                 <ListItemText>
                   <span style={{ color: "#FFC107" }}>Low Stock!</span>
                   &nbsp; You only have <b>{alert.quantity}</b> items in stock

@@ -5,6 +5,8 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import TableFooter from '@material-ui/core/TableFooter';
+import TablePagination from '@material-ui/core/TablePagination';
 import ViewHeading from "../global/ViewHeading";
 import { connect } from "react-redux";
 import appConfig from "../../scripts/config";
@@ -59,7 +61,7 @@ class SalesPage extends Component {
               axios
                 .delete(appConfig.serverRoot + "api/Sales/" + saleId)
                 .then(res => {
-                  this.props.fetchSales();
+                  this.props.fetchSales(this.props.sales.meta.startingIndex, this.props.sales.meta.rowsPerPage);
                 });
             }
           };
@@ -109,7 +111,7 @@ class SalesPage extends Component {
       data: qs.stringify(data)
     })
       .then(() => {
-        this.props.fetchSales();
+        this.props.fetchSales(this.props.sales.meta.startingIndex, this.props.sales.meta.rowsPerPage);
       })
       .catch(function(error) {
         alert("An unexpected error occurred while editing sales record.");
@@ -189,6 +191,18 @@ class SalesPage extends Component {
                 );
               })}
             </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  colSpan={6}
+                  count={123}
+                  rowsPerPage={this.props.sales.meta.rowsPerPage}
+                  page={this.props.sales.meta.startingIndex / this.props.sales.meta.rowsPerPage}
+                  onChangePage={() => { alert(0) }}
+                  onChangeRowsPerPage={() => { alert(0) }}
+                />
+              </TableRow>
+            </TableFooter>
           </Table>
         </ViewFrame>
         <Dialog

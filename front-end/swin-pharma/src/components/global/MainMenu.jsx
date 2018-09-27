@@ -19,18 +19,23 @@ class MainMenu extends Component {
     this.state = {
       currentPage: window.location.pathname
     };
-    window.setInterval(() => {
-      if (window.location.pathname !== this.state.currentPage) {
-        this.setState({
-          currentPage: window.location.pathname
-        });
-      }
-    }, 200);
+    // window.setInterval(() => {
+    //   if (window.location.pathname !== this.state.currentPage) {
+    //     this.setState({
+    //       currentPage: window.location.pathname
+    //     });
+    //   }
+    // }, 200);
+  }
+  handleClick(dest){
+    this.setState({
+      currentPage: dest
+    });
   }
   getAlertsListItem() {
     if (this.props.alerts.length > 0) {
       return (
-        <Link className="covert-link" to="/alerts">
+        <Link className="covert-link" to="/alerts" onClick={() => { this.handleClick("/alerts")}}>
           <ListItem button selected={this.state.currentPage === "/alerts"}>
             <ListItemIcon>
               <Badge color="error" badgeContent={this.props.alerts.length}>
@@ -43,7 +48,7 @@ class MainMenu extends Component {
       );
     } else {
       return (
-        <Link className="covert-link" to="/alerts">
+        <Link className="covert-link" to="/alerts" onClick={() => { this.handleClick("/alerts")}}>
           <ListItem button selected={this.state.currentPage === "/alerts"}>
             <ListItemIcon>
               <NotificationsIcon />
@@ -59,7 +64,7 @@ class MainMenu extends Component {
       <React.Fragment>
         <div id="gl-main-menu">
           <List component="nav">
-            <Link className="covert-link" to="/sales">
+            <Link className="covert-link" to="/sales" onClick={() => { this.handleClick("/sales")}}>
               <ListItem button selected={this.state.currentPage === "/sales"}>
                 <ListItemIcon>
                   <BubbleChartIcon />
@@ -67,7 +72,7 @@ class MainMenu extends Component {
                 <ListItemText primary="Sales" />
               </ListItem>
             </Link>
-            <Link className="covert-link" to="/products">
+            <Link className="covert-link" to="/products" onClick={() => { this.handleClick("/products")}}>
               <ListItem
                 button
                 selected={this.state.currentPage === "/products"}
@@ -78,7 +83,7 @@ class MainMenu extends Component {
                 <ListItemText primary="Products" />
               </ListItem>
             </Link>
-            <Link className="covert-link" to="/reports">
+            <Link className="covert-link" to="/reports" onClick={() => { this.handleClick("/reports")}}>
               <ListItem button selected={this.state.currentPage === "/reports"}>
                 <ListItemIcon>
                   <BarChartIcon />

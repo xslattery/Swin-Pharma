@@ -68,14 +68,17 @@ export const fetchProducts = () => {
   };
 };
 
-export const fetchSales = () => {
+export const fetchSales = (startingIndex, rowsPerPage) => {
   return dispatch => {
     dispatch(addAppProcessToStack());
-    axios.get(appConfig.serverRoot + "api/Sales").then(res => {
+    axios.get(appConfig.serverRoot + "api/Sales?start="+startingIndex+"&count="+rowsPerPage).then(res => {
       var rows = res.data;
       var sales = {
         data: {},
-        index: []
+        index: [],
+        meta: {
+          startingIndex
+        }
       };
       for (var i = 0; i < rows.length; i++) {
         var columns = rows[i].split(",");

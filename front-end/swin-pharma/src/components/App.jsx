@@ -25,7 +25,6 @@ class App extends Component {
   }
   sync() {
     this.props.fetchProducts();
-    this.props.fetchSales();
     this.props.fetchAlerts();
   }
   render() {
