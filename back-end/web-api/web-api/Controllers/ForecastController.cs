@@ -73,8 +73,7 @@ namespace web_api.Controllers
                     result += "\"day\": [ ";
                     for (int i = 0; i < dayLength; i++)
                     {
-                        double rollingAverage = 0; 
-                        double averageCounter = 0;
+                        double proffit = 0;
                         DateTime currentDate = startDate.AddDays(i);
 
                         SalesController.salesTableLock.WaitOne();
@@ -85,17 +84,16 @@ namespace web_api.Controllers
                                 DateTime compareDate;
                                 if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out compareDate))
                                 {
-                                    if (compareDate.DayOfWeek == currentDate.DayOfWeek)
+                                    if (compareDate == currentDate)
                                     {
-                                        rollingAverage += Double.Parse(item.purchasePrice) * sale.quantity;
-                                        averageCounter++;
+                                        proffit += Double.Parse(item.purchasePrice) * sale.quantity;
                                     }
                                 }
                             }
                         }
                         SalesController.salesTableLock.ReleaseMutex();
 
-                        result += (rollingAverage/averageCounter) + ",";
+                        result += proffit + ",";
                     }
                     result = result.Remove(result.Length - 1);
                     result += "],";
