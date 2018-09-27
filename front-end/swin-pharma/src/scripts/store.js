@@ -17,7 +17,15 @@ export default () => {
     sales: {
       data: {},
       index: [],
+<<<<<<< HEAD
       meta: []
+=======
+      meta: {
+        total: 0,
+        startingIndex: 0,
+        rowsPerPage: 30
+      }
+>>>>>>> 6ffddd46183fd3811608a46b5e638ee411e3660a
     },
     reportData: {
       rows: [],
