@@ -7,28 +7,19 @@ class MainLayout extends Component {
   render() {
     return (
       <React.Fragment>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column"
-          }}
-        >
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <AppBar />
         </div>
         <MainMenu />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row"
-          }}
-        >
+        <div style={{ display: "flex", flexDirection: "row" }}>
           <div
             style={{
               flexGrow: "1",
               height: "auto",
               marginTop: "60px",
               marginLeft: "240px",
-              overflow: "hidden"
+              overflow: "hidden",
+              backgroundImage: "url(paper.png)"
             }}
           >
             <PageRouter />
