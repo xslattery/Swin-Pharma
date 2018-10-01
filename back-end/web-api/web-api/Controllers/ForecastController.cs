@@ -165,80 +165,111 @@ namespace web_api.Controllers
                 }
 
                 int dayOffset = (int)startDate.Day;
-                startDate = startDate.AddDays(-dayOffset);
+                startDate = startDate.AddDays(-dayOffset + 1);
+                int monthLength = DateTime.DaysInMonth(startDate.Year, startDate.Month);
+
+                TimeSpan differenceDate = todayDate - startDate;
+                int difference = differenceDate.Days;
+                int dayLength = difference + 1;
+                int forecastLength = monthLength - difference - 1;
+
+                if (difference >= monthLength)
+                {
+                    dayLength = monthLength;
+                    forecastLength = 0;
+                }
+                else if (difference == 0)
+                {
+                    dayLength = 1;
+                    forecastLength = monthLength - 1;
+                }
+                else if (difference < 0)
+                {
+                    dayLength = 0;
+                    forecastLength = monthLength;
+                }
+                if (dayLength > monthLength) dayLength = monthLength;
+                if (forecastLength > monthLength) forecastLength = monthLength;
 
                 string result = "{";
-                //result += "\"row\": [";
+                result += "\"row\": [";
 
-                //InventoryController.itemTableLock.WaitOne();
-                //foreach (var item in InventoryController.itemTable)
-                //{
-                //result += "{";
-                //result += "\"name\":\"" + item.name + "\",";
+                InventoryController.itemTableLock.WaitOne();
+                foreach (var item in InventoryController.itemTable)
+                {
+                    result += "{";
+                    result += "\"name\":\"" + item.name + "\",";
 
-                //result += "\"day\": [ ";
-                //for (int i = 0; i < dayLength; i++)
-                //{
-                //    double proffit = 0;
-                //    DateTime currentDate = startDate.AddDays(i);
+                    result += "\"day\": [ ";
+                    for (int i = 0; i < dayLength; i++)
+                    {
+                        double proffit = 0;
+                        DateTime currentDate = startDate.AddDays(i);
 
-                //    SalesController.salesTableLock.WaitOne();
-                //    foreach (var sale in SalesController.salesTable)
-                //    {
-                //        if (item.id == sale.itemID)
-                //        {
-                //            DateTime compareDate;
-                //            if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out compareDate))
-                //            {
-                //                if (compareDate == currentDate)
-                //                {
-                //                    proffit += Double.Parse(item.purchasePrice) * sale.quantity;
-                //                }
-                //            }
-                //        }
-                //    }
-                //    SalesController.salesTableLock.ReleaseMutex();
+                        SalesController.salesTableLock.WaitOne();
+                        foreach (var sale in SalesController.salesTable)
+                        {
+                            if (item.id == sale.itemID)
+                            {
+                                DateTime compareDate;
+                                if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out compareDate))
+                                {
+                                    if (compareDate == currentDate)
+                                    {
+                                        proffit += Double.Parse(item.purchasePrice) * sale.quantity;
+                                    }
+                                }
+                            }
+                        }
+                        SalesController.salesTableLock.ReleaseMutex();
 
-                //    result += proffit + ",";
-                //}
-                //result = result.Remove(result.Length - 1);
-                //result += "],";
+                        result += proffit + ",";
+                    }
+                    result = result.Remove(result.Length - 1);
+                    result += "],";
 
-                //    result += "\"forecast\": [ ";
-                //    for (int i = dayLength; i < dayLength + forecastLength; i++)
-                //    {
-                //        double rollingAverage = 0;
-                //        double averageCounter = 0;
-                //        DateTime currentDate = startDate.AddDays(i);
+                    result += "\"forecast\": [ ";
+                    for (int i = dayLength; i < dayLength + forecastLength; i++)
+                    {
+                        double rollingAverage = 0;
+                        double averageCounter = 0;
+                        DateTime currentDate = startDate.AddDays(i);
 
-                //        SalesController.salesTableLock.WaitOne();
-                //        foreach (var sale in SalesController.salesTable)
-                //        {
-                //            if (item.id == sale.itemID)
-                //            {
-                //                DateTime compareDate;
-                //                if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out compareDate))
-                //                {
-                //                    if (compareDate.DayOfWeek == currentDate.DayOfWeek)
-                //                    {
-                //                        rollingAverage += Double.Parse(item.purchasePrice) * sale.quantity;
-                //                        averageCounter++;
-                //                    }
-                //                }
-                //            }
-                //        }
-                //        SalesController.salesTableLock.ReleaseMutex();
+                        SalesController.salesTableLock.WaitOne();
+                        foreach (var sale in SalesController.salesTable)
+                        {
+                            if (item.id == sale.itemID)
+                            {
+                                DateTime compareDate;
+                                if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out compareDate))
+                                {
+                                    if (compareDate.Day == currentDate.Day)
+                                    {
+                                        rollingAverage += Double.Parse(item.purchasePrice) * sale.quantity;
+                                        averageCounter++;
+                                    }
+                                }
+                            }
+                        }
+                        SalesController.salesTableLock.ReleaseMutex();
 
-                //        result += (rollingAverage / averageCounter) + ",";
-                //    }
-                //    result = result.Remove(result.Length - 1);
-                //    result += "]";
-                //    result += "},";
-                //}
-                //InventoryController.itemTableLock.ReleaseMutex();
-                //result = result.Remove(result.Length - 1);
+                        if (averageCounter > 0)
+                        {
+                            result += (rollingAverage / averageCounter) + ",";
+                        }
+                        else
+                        {
+                            result += 0 + ",";
+                        }
+                    }
+                    result = result.Remove(result.Length - 1);
+                    result += "]";
+                    result += "},";
+                }
+                InventoryController.itemTableLock.ReleaseMutex();
+                result = result.Remove(result.Length - 1);
 
-                //result += "]";
+                result += "]";
                 result += "}";
 
                 return Ok(result);
