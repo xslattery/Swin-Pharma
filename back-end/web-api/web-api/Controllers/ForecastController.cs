@@ -217,7 +217,7 @@ namespace web_api.Controllers
                             if (item.id == sale.itemID)
                             {
                                 DateTime compareDate;
-                                if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out compareDate))
+                                if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), DateTimeStyles.AssumeLocal, out compareDate))
                                 {
                                     if (compareDate == currentDate)
                                     {
@@ -295,38 +295,72 @@ namespace web_api.Controllers
         [ProducesResponseType(200, Type = typeof(string))]
         public IActionResult GetWeekGroup([FromQuery(Name = "todayDate")] string today, [FromQuery(Name = "date")] string date)
         {
-            // ASSUMPTION:
-            // This will return a JSON file that will contain
-            // a list of groups (Brands) with predictions for the week
-            // ALL groups will be returned together.
-
             // todayDate - will be the day the forcast is being generated (used to know where actual data ends and predictions begin)
-            // date - will be any date in the week the forcast will be generated for
+            // startDate - will be any date in the week the forcast will be generated for
+            DateTime startDate;
+            DateTime todayDate;
 
-            // 1. Load Sales & Inventory Controllers (if not already) (for loading the data)
+            if (DateTime.TryParse(date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out startDate) && DateTime.TryParse(today, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out todayDate))
+            {
+                // Load Sales & Inventory Controllers (if not already) (for loading the data)
+                if (!InventoryController.itemTableLoadedFromFile)
+                {
+                    InventoryController c = new InventoryController();
+                }
 
-            // 2. Get the date of the start of the week
+                if (!SalesController.salesTableLoadedFromFile)
+                {
+                    SalesController sc = new SalesController();
+                }
 
-            // 3. Get the number of days in the week that have alread passed (use start date)
-            // 4. Get the number of days in the week that will be predicted
-            //    (It is possible for the week to be entiraly existing data or entrialy predictions)
+                // Get the date of the start of the week
+                DateTime weekStartDate = GetStartOfWeek(todayDate);
 
-            // 5. Generate a dictionary of groups (Brands)
-            //    This will be done by looping over every item and adding is brand if it does not already exist in the dictionary.
-            // Each entry (Brand) in the diction will contain a class containing:
-            // class {
-            //      string brandName;
-            //      List<double> runningTotal;   <- one entry for each
-            //      List<int> runningCount;      <- day of the week
-            // }
+                // Get the number of days in the week that have alread passed (use start date)
+                TimeSpan differenceDate = weekStartDate - startDate;
+                int difference = differenceDate.Days;
+
+                // Get the number of days in the week that will be predicted
+                differenceDate = todayDate - startDate;
+                int predictionDays = differenceDate.Days;
+
+                // Generate a dictionary of groups (Brands)
+                Dictionary<string, int> _predictions = new Dictionary<string, int>();
+                foreach (var item in InventoryController.itemTable)
+                {
+                    if (!_predictions.ContainsKey(item.brand))
+                    {
+                        _predictions.Add(item.brand, 0);
+                    }
+                }
+
+                // 6. Loop over every item and populate the data in the dictionary
+                //    - Adding to the running total and count for each day
+                foreach (var sale in SalesController.salesTable)
+                {
+                    if (sale.date == weekStartDate.ToString())
+                    {
+                        
+                    }
+                }
+            }
 
             // 6. Loop over every item and populate the data in the dictionary
             //    - Adding to the running total and count for each day
 
             // 7. Generate a JSON file based off of the data
-            //    - Will require dividing the running totals by the conuts for each day to get the average
 
             return StatusCode(400);
+        }
+
+        private DateTime GetStartOfWeek(DateTime todayDate)
+        {
+            DayOfWeek firstDay = CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
+            DateTime firstDayInWeek = todayDate.Date;
+            while (firstDayInWeek.DayOfWeek != firstDay)
+                firstDayInWeek = firstDayInWeek.AddDays(-1);
+
+            return firstDayInWeek;
         }
 
 
