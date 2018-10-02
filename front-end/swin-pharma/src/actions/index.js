@@ -120,12 +120,28 @@ export const fetchReportData = (type, date) => {
     dispatch(addAppProcessToStack());
     date = date.split("-");
     date = date[2] + "/" + date[1] + "/" + date[0];
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1;
+    var yyyy = today.getFullYear();
     axios
-      .get(appConfig.serverRoot + "api/Report/" + type + "?date=" + date)
+      .get(
+        appConfig.serverRoot +
+          "api/Forecast/Individual/" +
+          type +
+          "?todayDate=" +
+          dd +
+          "/" +
+          mm +
+          "/" +
+          yyyy +
+          "&date=" +
+          date
+      )
       .then(res => {
-        var rows = type === "Week" ? res.data.row : res.data.rows;
+        console.log(res.data.row);
         var reportData = {
-          rows,
+          rows: res.data.row,
           reportType: type,
           reportDate: date
         };

@@ -20,13 +20,14 @@ import ordinalOf from "../../scripts/monthOrdinals";
 import { fetchReportData } from "../../actions/index.js";
 import { bindActionCreators } from "redux";
 import config from "../../scripts/config";
+import daysInMonth from "../../scripts/daysInMonth";
 
 class SalesPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
       type: "Month",
-      date: "00/00/0000"
+      date: "00-00-0000"
     };
   }
   getTableHead() {
@@ -37,113 +38,82 @@ class SalesPage extends Component {
           if (this.props.reportData.reportType === "Week") {
             return (
               <React.Fragment>
+                <TableCell>Sunday</TableCell>
                 <TableCell>Monday</TableCell>
                 <TableCell>Tuesday</TableCell>
                 <TableCell>Wednesday</TableCell>
                 <TableCell>Thursday</TableCell>
                 <TableCell>Friday</TableCell>
                 <TableCell>Saturday</TableCell>
-                <TableCell>Sunday</TableCell>
               </React.Fragment>
             );
           } else {
-            return this.props.reportData.rows[0].values.map((c, i) => (
-              <TableCell>{ordinalOf(i + 1)}</TableCell>
-            ));
+            return (() => {
+              var results = [];
+              for (
+                var i = 1;
+                i <=
+                daysInMonth(
+                  this.state.date.split("-")[1],
+                  this.state.date.split("-")[2]
+                );
+                i++
+              ) {
+                results.push(<TableCell>{ordinalOf(i)}</TableCell>);
+              }
+              return results;
+            })();
           }
         })()}
       </TableRow>
     );
   }
   getTableData() {
-    if (this.props.reportData.reportType === "Week") {
-      var totals = { mon: 0, tue: 0, wed: 0, thu: 0, fri: 0, sat: 0, sun: 0 };
-      var result = [];
-      for (var r in this.props.reportData.rows) {
-        var thisRow = this.props.reportData.rows[r];
-        totals = {
-          mon: totals.mon + parseInt(thisRow.mon),
-          tue: totals.tue + parseInt(thisRow.tue),
-          wed: totals.wed + parseInt(thisRow.wed),
-          thu: totals.thu + parseInt(thisRow.thu),
-          fri: totals.fri + parseInt(thisRow.fri),
-          sat: totals.sat + parseInt(thisRow.sat),
-          sun: totals.sun + parseInt(thisRow.sun)
-        };
-        result.push(
-          <TableRow>
-            <TableCell>{thisRow.name}</TableCell>
-            <TableCell>${thisRow.mon}</TableCell>
-            <TableCell>${thisRow.tue}</TableCell>
-            <TableCell>${thisRow.wed}</TableCell>
-            <TableCell>${thisRow.thu}</TableCell>
-            <TableCell>${thisRow.fri}</TableCell>
-            <TableCell>${thisRow.sat}</TableCell>
-            <TableCell>${thisRow.sun}</TableCell>
-          </TableRow>
-        );
-      }
-      console.log(totals);
-      result.push(
+    var result = [];
+    var totals = [];
+    var totalsForecast = [];
+    result.push(
+      this.props.reportData.rows.map(r => (
         <TableRow>
-          <TableCell>
-            <b>Total:</b>
-          </TableCell>
-          <TableCell>
-            <b>${totals.mon}</b>
-          </TableCell>
-          <TableCell>
-            <b>${totals.tue}</b>
-          </TableCell>
-          <TableCell>
-            <b>${totals.wed}</b>
-          </TableCell>
-          <TableCell>
-            <b>${totals.thu}</b>
-          </TableCell>
-          <TableCell>
-            <b>${totals.fri}</b>
-          </TableCell>
-          <TableCell>
-            <b>${totals.sat}</b>
-          </TableCell>
-          <TableCell>
-            <b>${totals.sun}</b>
-          </TableCell>
-        </TableRow>
-      );
-      return result;
-    } else {
-      var result = [];
-      var totals = [];
-      result.push(
-        this.props.reportData.rows.map(r => (
-          <TableRow>
-            <TableCell>{r.name}</TableCell>
-            {r.values.map((c, i) => {
-              if (typeof totals[i] === typeof undefined) totals[i] = 0;
-              totals[i] = totals[i] + parseInt(c);
-              return <TableCell>${c}</TableCell>;
-            })}
-          </TableRow>
-        ))
-      );
-      result.push(
-        <TableRow>
-          <TableCell>
-            <b>Total:</b>
-          </TableCell>
-          {this.props.reportData.rows[0].values.map((c, i) => {
+          <TableCell>{r.name}</TableCell>
+          {r.day.map((c, i) => {
+            if (typeof totals[i] === typeof undefined) totals[i] = 0;
+            totals[i] = totals[i] + parseInt(c);
+            return <TableCell>${c}</TableCell>;
+          })}
+          {r.forecast.map((c, i) => {
+            if (typeof totalsForecast[i] === typeof undefined)
+              totalsForecast[i] = 0;
+            totalsForecast[i] = totalsForecast[i] + parseInt(c);
             return (
-              <TableCell>
-                <b>${totals[i]}</b>
-              </TableCell>
+              <TableCell style={{ backgroundColor: "#ffeeee" }}>${c}</TableCell>
             );
           })}
         </TableRow>
-      );
-      return result;
-    }
+      ))
+    );
+    result.push(
+      <TableRow>
+        <TableCell>
+          <b>Total:</b>
+        </TableCell>
+        {this.props.reportData.rows[0].day.map((c, i) => {
+          return (
+            <TableCell>
+              <b>${totals[i]}</b>
+            </TableCell>
+          );
+        })}
+        {this.props.reportData.rows[0].forecast.map((c, i) => {
+          return (
+            <TableCell style={{ backgroundColor: "#ffeeee" }}>
+              <b>${totalsForecast[i]}</b>
+            </TableCell>
+          );
+        })}
+      </TableRow>
+    );
+    return result;
   }
   getTable() {
     if (this.props.reportData.type !== "NULL") {
@@ -176,7 +146,6 @@ class SalesPage extends Component {
                       type: e.target.value
                     });
                   }}
-                  //   input={<Input id="SQVC5AP5OZ" />}
                   autoWidth
                 >
                   <MenuItem value={"Week"}>Week</MenuItem>
