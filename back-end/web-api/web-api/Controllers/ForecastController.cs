@@ -319,13 +319,14 @@ namespace web_api.Controllers
             // startDate - will be any date in the week the forcast will be generated for
             DateTime todayDate;
             DateTime startDate;
-            if (!DateTime.TryParse(date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out startDate) || !DateTime.TryParse(today, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out todayDate))
+            if (!DateTime.TryParse(date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out startDate) 
+                || !DateTime.TryParse(today, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out todayDate))
             {
                 // Failed to parse the dates.
                 return StatusCode(400);
             }
 
-            // 1. Load Sales & Inventory Controllers (if not already) (for loading the data)
+            // Load Sales & Inventory Controllers (if not already) (for loading the data)
             if (!InventoryController.itemTableLoadedFromFile)
             {
                 InventoryController c = new InventoryController();
@@ -340,22 +341,16 @@ namespace web_api.Controllers
             int weekStartOffset = (int)startDate.DayOfWeek;
             DateTime weekStartDate = startDate.AddDays(-weekStartOffset);
 
-            // 3. Get the number of days in the week that have alread passed
-            // 4. Get the number of days in the week that will be predicted
+            // Get the number of days in the week that have alread passed
+            // Get the number of days in the week that will be predicted
             //    (It is possible for the week to be entiraly existing data or entrialy predictions)
             TimeSpan differenceDate = weekStartDate - startDate;
             int weekStartDate_startDate_difference = differenceDate.Days;
 
-            int actualDays = 0;
-            int forecastDays = 0;
-
-            // TODO(Xavier):
-            // The values for 'acutalDays' and 'forecastDays' need
-            // to be calculated. Combined they should not be greater
-            // than 7
-
-            // 5. Generate a dictionary of groups (Brands)
-            //    This will be done by looping over every item and adding is brand if it does not already exist in the dictionary.
+            int actualDays = differenceDate.Days;
+            int forecastDays = 7 - differenceDate.Days;
+            
+            // Generate a dictionary of groups (Brands)
             Dictionary<string, GroupForecastData> groupData = new Dictionary<string, GroupForecastData>();
             InventoryController.itemTableLock.WaitOne();
             foreach (var item in InventoryController.itemTable)
@@ -364,14 +359,13 @@ namespace web_api.Controllers
             }
             InventoryController.itemTableLock.ReleaseMutex();
 
-            // 6. Loop over every sale and populate the data in the dictionary
-            //    - Adding to the running total and count for each day
+            // Loop over every sale and populate the data in the dictionary - Adding to the running total and count for each day
             SalesController.salesTableLock.WaitOne();
             InventoryController.itemTableLock.WaitOne();
             foreach (var sale in SalesController.salesTable)
             {
                 DateTime saleDate;
-                if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out saleDate))
+                if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), DateTimeStyles.AssumeLocal, out saleDate))
                 {
                     // Get the item from the sale (used to find out the sales brand)
                     InventoryItem item = null;
@@ -387,8 +381,8 @@ namespace web_api.Controllers
             InventoryController.itemTableLock.ReleaseMutex();
             SalesController.salesTableLock.ReleaseMutex();
 
-            // TODO(Xavier):
             // 7. Generate a JSON file based off of the data
+            
 
             return StatusCode(400);
         }
