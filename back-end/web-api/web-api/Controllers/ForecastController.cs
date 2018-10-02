@@ -408,6 +408,96 @@ namespace web_api.Controllers
 
             return StatusCode(400);
         }
+       
+
+
+        /// ///////////////////////////////////////////////////////////
+        /// Group Forecasting:
+        /// ///////////////////////////////////////////////////////////
+
+
+
+        // Generateing the weekly group forecast:
+        [HttpGet]
+        [Route("Group/Month/")]
+        [ProducesResponseType(200, Type = typeof(string))]
+        public IActionResult GetWeekGroup([FromQuery(Name = "todayDate")] string today, [FromQuery(Name = "date")] string date)
+        {
+            // ASSUMPTION:
+            // This will return a JSON file that will contain
+            // a list of groups (Brands) with predictions for the week
+            // ALL groups will be returned together.
+
+            // todayDate - will be the day the forcast is being generated (used to know where actual data ends and predictions begin)
+            // date - will be any date in the week the forcast will be generated for
+
+            // 1. Load Sales & Inventory Controllers (if not already) (for loading the data)
+
+            // 2. Get the date of the start of the week
+
+            // 3. Get the number of days in the week that have alread passed (use start date)
+            // 4. Get the number of days in the week that will be predicted
+            //    (It is possible for the week to be entiraly existing data or entrialy predictions)
+
+            // 5. Generate a dictionary of groups (Brands)
+            //    This will be done by looping over every item and adding is brand if it does not already exist in the dictionary.
+            // Each entry (Brand) in the diction will contain a class containing:
+            // class {
+            //      string brandName;
+            //      List<double> runningTotal;   <- one entry for each
+            //      List<int> runningCount;      <- day of the week
+            // }
+
+            // 6. Loop over every item and populate the data in the dictionary
+            //    - Adding to the running total and count for each day
+
+            // 7. Generate a JSON file based off of the data
+            //    - Will require dividing the running totals by the conuts for each day to get the average
+
+            return StatusCode(400);
+        }
+
+
+        // Generateing the monthly group forecast:
+        [HttpGet]
+        [Route("Group/Month/")]
+        [ProducesResponseType(200, Type = typeof(string))]
+        public IActionResult GetMonthGroup([FromQuery(Name = "todayDate")] string today, [FromQuery(Name = "date")] string date)
+        {
+            // ASSUMPTION:
+            // This will return a JSON file that will contain
+            // a list of groups (Brands) with predictions for the month
+            // ALL groups will be returned together.
+
+            // todayDate - will be the day the forcast is being generated (used to know where actual data ends and predictions begin)
+            // date - will be any date in the month the forcast will be generated for
+
+            // 1. Load Sales & Inventory Controllers (if not already) (for loading the data)
+
+            // 2. Get the date of the start of the month
+
+            // 3. Get the number of days in the month that have alread passed (use start date)
+            // 4. Get the number of days in the month that will be predicted
+            //    (It is possible for the month to be entiraly existing data or entrialy predictions)
+
+            // 5. Generate a dictionary of groups (Brands)
+            //    This will be done by looping over every item and adding is brand if it does not already exist in the dictionary.
+            // Each entry (Brand) in the diction will contain a class containing:
+            // class {
+            //      string brandName;
+            //      List<double> runningTotal;   <- one entry for each
+            //      List<int> runningCount;      <- day of the month
+            // }
+
+            // 6. Loop over every item and populate the data in the dictionary
+            //    - Adding to the running total and count for each day
+
+            // 7. Generate a JSON file based off of the data
+            //    - Will require dividing the running totals by the conuts for each day to get the average
+
+            return StatusCode(400);
+        }
+
 
     }
 }
