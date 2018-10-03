@@ -77,6 +77,7 @@ namespace web_api.Controllers
                     result += "\"day\": [ ";
                     for (int i = 0; i < dayLength; i++)
                     {
+                        /*
                         double proffit = 0;
                         DateTime currentDate = startDate.AddDays(i);
 
@@ -98,6 +99,9 @@ namespace web_api.Controllers
                         SalesController.salesTableLock.ReleaseMutex();
 
                         result += proffit + ",";
+                        */
+
+                        result += 0 + ",";
                     }
                     result = result.Remove(result.Length - 1);
                     result += "],";
@@ -208,6 +212,7 @@ namespace web_api.Controllers
                     result += "\"day\": [ ";
                     for (int i = 0; i < dayLength; i++)
                     {
+                        /*
                         double proffit = 0;
                         DateTime currentDate = startDate.AddDays(i);
 
@@ -229,6 +234,8 @@ namespace web_api.Controllers
                         SalesController.salesTableLock.ReleaseMutex();
 
                         result += proffit + ",";
+                        */
+                        result += 0 + ",";
                     }
                     result = result.Remove(result.Length - 1);
                     result += "],";
@@ -292,14 +299,20 @@ namespace web_api.Controllers
         private class GroupForecastData
         {
             public string name;
-            public List<double> forecastRunningTotall;
+            public List<double> forecastRunningTotal;
             public List<int> forecastRunningCount;
 
             public GroupForecastData(string name, int length)
             {
                 this.name = name;
-                this.forecastRunningTotall = new List<double>(length);
+                this.forecastRunningTotal = new List<double>(length);
                 this.forecastRunningCount = new List<int>(length);
+
+                for (int i = 0; i < length; i++)
+                {
+                    this.forecastRunningTotal.Add(0);
+                    this.forecastRunningCount.Add(0);
+                }
             }
         }
 
@@ -344,12 +357,31 @@ namespace web_api.Controllers
             // Get the number of days in the week that have alread passed
             // Get the number of days in the week that will be predicted
             //    (It is possible for the week to be entiraly existing data or entrialy predictions)
-            TimeSpan differenceDate = weekStartDate - startDate;
+            TimeSpan differenceDate =  todayDate - weekStartDate;
             int weekStartDate_startDate_difference = differenceDate.Days;
 
-            int actualDays = differenceDate.Days;
-            int forecastDays = 7 - differenceDate.Days;
-            
+            int actualDays = weekStartDate_startDate_difference + 1;
+            int forecastDays = 7 - weekStartDate_startDate_difference - 1;
+
+            if (weekStartDate_startDate_difference >= 7)
+            {
+                actualDays = 7;
+                forecastDays = 0;
+            }
+            else if (weekStartDate_startDate_difference == 0)
+            {
+                actualDays = 1;
+                forecastDays = 6;
+            }
+            else if (weekStartDate_startDate_difference < 0)
+            {
+                actualDays = 0;
+                forecastDays = 7;
+            }
+            if (actualDays > 7) actualDays = 7;
+            if (forecastDays > 7) forecastDays = 7;
+
+
             // Generate a dictionary of groups (Brands)
             Dictionary<string, GroupForecastData> groupData = new Dictionary<string, GroupForecastData>();
             InventoryController.itemTableLock.WaitOne();
@@ -374,17 +406,49 @@ namespace web_api.Controllers
                         if (sale.itemID == compareItem.id) item = compareItem;
                     }
 
-                    groupData[item.brand].forecastRunningTotall[(int)saleDate.DayOfWeek] += Double.Parse(item.purchasePrice) * sale.quantity;
-                    groupData[item.brand].forecastRunningCount[(int)saleDate.DayOfWeek] += 1;
+                    int dayOfWeek = (int)saleDate.DayOfWeek;
+                    groupData[item.brand].forecastRunningTotal[dayOfWeek] += Double.Parse(item.purchasePrice) * sale.quantity;
+                    groupData[item.brand].forecastRunningCount[dayOfWeek] += 1;
+
                 }
             }
             InventoryController.itemTableLock.ReleaseMutex();
             SalesController.salesTableLock.ReleaseMutex();
 
-            // 7. Generate a JSON file based off of the data
-            
+            // Generate a JSON file based off of the data
+            string result = "{";
+            result += "\"rows\": [";
+            foreach (var group in groupData)
+            {
+                result += "{";
+                result += "\"name\":\"" + group.Value.name + "\",";
+                result += "\"day\": [ ";
 
-            return StatusCode(400);
+                // Actual Days:
+                for (int i = 0; i < actualDays; i++)
+                {
+                    result += 0 + ",";
+                }
+                result = result.Remove(result.Length - 1);
+
+                result += "],";
+                result += "\"forecast\": [ ";
+
+                // Forecast Days:
+                for (int i = actualDays; i < 7; i++)
+                {
+                    result += (group.Value.forecastRunningTotal[i] / group.Value.forecastRunningCount[i]) + ",";
+                }
+                result = result.Remove(result.Length - 1);
+
+                result += "]";
+                result += "},";
+            }
+            result = result.Remove(result.Length - 1);
+            result += "]";
+            result += "}";
+
+            return Ok(result);
         }
 
 
