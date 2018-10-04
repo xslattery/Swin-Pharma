@@ -14,8 +14,8 @@ import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
 import Button from "@material-ui/core/Button";
-import SyncIcon from "@material-ui/icons/Sync";
-import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
+import SyncIcon from "@material-ui/icons/SyncTwoTone";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownloadTwoTone";
 import ordinalOf from "../../scripts/monthOrdinals";
 import { fetchReportData } from "../../actions/index.js";
 import { bindActionCreators } from "redux";
@@ -279,13 +279,9 @@ const mapDispatchToProps = dispatch => {
   );
 };
 
-const mapStateToProps = function(state) {
-  return {
-    reportData: state.reportData
-  };
-};
-
 export default connect(
-  mapStateToProps,
+  state => ({
+    reportData: state.reportData
+  }),
   mapDispatchToProps
 )(SalesPage);

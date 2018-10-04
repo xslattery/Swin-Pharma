@@ -25,8 +25,11 @@ class App extends Component {
   }
   sync() {
     this.props.fetchProducts();
-    this.props.fetchSales();
     this.props.fetchAlerts();
+    this.props.fetchSales(
+      this.props.sales.meta.startingIndex,
+      this.props.sales.meta.rowsPerPage
+    );
   }
   render() {
     return (
@@ -54,6 +57,8 @@ const mapDispatchToProps = dispatch => {
 };
 
 export default connect(
-  null,
+  state => ({
+    sales: state.sales
+  }),
   mapDispatchToProps
 )(App);

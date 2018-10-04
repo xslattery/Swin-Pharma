@@ -6,7 +6,8 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
+import CloseIcon from "@material-ui/icons/CloseTwoTone";
+import WarningIcon from "@material-ui/icons/WarningTwoTone";
 
 class AlertsPage extends Component {
   render() {
@@ -17,11 +18,11 @@ class AlertsPage extends Component {
           <List>
             {this.props.alerts.map((alert, i) => (
               <ListItem key={i} dense>
+                <WarningIcon />
                 <ListItemText>
                   <span style={{ color: "#FFC107" }}>Low Stock!</span>
-                  &nbsp; You only have <b>{alert.quantity}</b> items in stock
-                  for
-                  <b>'{alert.name}'</b>
+                  &nbsp; You only have <b>{alert.quantity}</b> units in stock
+                  for the item named <b>'{alert.name}'</b>
                 </ListItemText>
                 <IconButton>
                   <CloseIcon />

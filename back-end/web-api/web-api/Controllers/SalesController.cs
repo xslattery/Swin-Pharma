@@ -318,6 +318,22 @@ namespace web_api.Controllers
             return Ok(result);
         }
 
+        // Used for getting a single sales group:
+        [HttpGet]
+        [Route("Count/")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<int>))]
+        public IActionResult GetCount()
+        {
+            System.Diagnostics.Debug.WriteLine("########## GET ID Sale");
+            Console.WriteLine("########## GET ID Sale");
+
+            salesTableLock.WaitOne();
+            int count = salesTable.Count;
+            salesTableLock.ReleaseMutex();
+
+            return Ok(count);
+        }
+
         //
         // DEPRECATED
         //

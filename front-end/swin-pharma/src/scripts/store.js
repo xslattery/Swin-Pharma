@@ -16,7 +16,12 @@ export default () => {
     },
     sales: {
       data: {},
-      index: []
+      index: [],
+      meta: {
+        totalSalesCount: 0,
+        startingIndex: 0,
+        rowsPerPage: 10
+      }
     },
     reportData: {
       rows: [],
