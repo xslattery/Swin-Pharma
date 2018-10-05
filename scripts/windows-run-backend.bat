@@ -1,4 +1,3 @@
 cd ..
-cd ./front-end/swin-pharma
-call npm install
-call npm start
+cd ./back-end/web-api
+call dotnet run -c Release -p ./web-api 
