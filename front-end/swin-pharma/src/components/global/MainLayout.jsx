@@ -11,15 +11,19 @@ class MainLayout extends Component {
           <AppBar />
         </div>
         <MainMenu />
-        <div style={{ display: "flex", flexDirection: "row" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row"
+          }}
+        >
           <div
             style={{
               flexGrow: "1",
               height: "auto",
               marginTop: "60px",
               marginLeft: "240px",
-              overflow: "hidden",
-              backgroundImage: "url(paper.png)"
+              overflow: "hidden"
             }}
           >
             <PageRouter />

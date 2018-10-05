@@ -22,6 +22,13 @@ const updateReportData = reportData => {
   };
 };
 
+const updateForecastsData = forecastsData => {
+  return {
+    type: "LOAD_FETCHED_FORECAST_DATA",
+    payload: forecastsData
+  };
+};
+
 const updateAlerts = alerts => {
   return {
     type: "LOAD_FETCHED_ALERTS",
@@ -120,28 +127,12 @@ export const fetchReportData = (type, date) => {
     dispatch(addAppProcessToStack());
     date = date.split("-");
     date = date[2] + "/" + date[1] + "/" + date[0];
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth() + 1;
-    var yyyy = today.getFullYear();
     axios
-      .get(
-        appConfig.serverRoot +
-          "api/Forecast/Individual/" +
-          type +
-          "?todayDate=" +
-          dd +
-          "/" +
-          mm +
-          "/" +
-          yyyy +
-          "&date=" +
-          date
-      )
+      .get(appConfig.serverRoot + "api/Report/" + type + "?date=" + date)
       .then(res => {
-        console.log(res.data.row);
+        var rows = type === "Week" ? res.data.row : res.data.rows;
         var reportData = {
-          rows: res.data.row,
+          rows,
           reportType: type,
           reportDate: date
         };
@@ -151,7 +142,7 @@ export const fetchReportData = (type, date) => {
   };
 };
 
-export const fetchForecastData = (type, date) => {
+export const fetchForecastData = (type, date, reportItemType) => {
   return dispatch => {
     dispatch(addAppProcessToStack());
     date = date.split("-");
@@ -160,10 +151,13 @@ export const fetchForecastData = (type, date) => {
     var dd = today.getDate();
     var mm = today.getMonth() + 1;
     var yyyy = today.getFullYear();
+    reportItemType = reportItemType === "PRODUCT" ? "Individual" : "Group";
     axios
       .get(
         appConfig.serverRoot +
-          "api/Forecast/Individual/" +
+          "api/Forecast/" +
+          reportItemType +
+          "/" +
           type +
           "?todayDate=" +
           dd +
@@ -175,13 +169,14 @@ export const fetchForecastData = (type, date) => {
           date
       )
       .then(res => {
-        console.log(res.data.row);
-        var reportData = {
-          rows: res.data.row,
+        var rows =
+          reportItemType === "Individual" ? res.data.row : res.data.rows;
+        var forecastsData = {
+          rows,
           reportType: type,
           reportDate: date
         };
-        dispatch(updateReportData(reportData));
+        dispatch(updateForecastsData(forecastsData));
         dispatch(removeAppProcessFromStack());
       });
   };

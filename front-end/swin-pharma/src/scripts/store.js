@@ -28,7 +28,7 @@ export default () => {
       reportType: "Week",
       reportDate: "NULL"
     },
-    forecastsData: {
+    forecastData: {
       rows: [],
       reportType: "Week",
       reportDate: "NULL"
