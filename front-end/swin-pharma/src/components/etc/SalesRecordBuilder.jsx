@@ -117,7 +117,7 @@ class SalesRecordBuilder extends Component {
             .then(res => {
               requestsStillOut--;
               if (requestsStillOut == 0) {
-                this.props.fetchSales();
+                this.props.fetchSales(0, this.props.sales.meta.rowsPerPage);
                 this.setState({ rows: [] });
               }
             })
@@ -247,9 +247,7 @@ class SalesRecordBuilder extends Component {
 }
 
 const mapStateToProps = state => {
-  return {
-    products: state.products
-  };
+  return { products: state.products, sales: state.sales };
 };
 
 const mapDispatchToProps = dispatch => {

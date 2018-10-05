@@ -87,8 +87,8 @@ class SalesPage extends Component {
       data: data,
       config: { headers: { "Content-Type": "multipart/form-data" } }
     })
-      .then(function(response) {
-        console.log(response);
+      .then(function() {
+        this.props.fetchSales(0, this.props.sales.meta.rowsPerPage);
       })
       .catch(function(error) {
         console.log(error);

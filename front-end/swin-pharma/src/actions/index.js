@@ -76,49 +76,49 @@ export const fetchProducts = () => {
 };
 
 export const fetchSales = (startingIndex, rowsPerPage) => {
+  console.log(startingIndex);
+  console.log(rowsPerPage);
   return dispatch => {
     dispatch(addAppProcessToStack());
     axios.get(appConfig.serverRoot + "api/Sales/Count").then(res => {
-      dispatch({
-        type: "UPDATE_TOTAL_SALES_COUNT",
-        payload: res.data
-      });
-      dispatch(removeAppProcessFromStack());
-    });
-    dispatch(addAppProcessToStack());
-    axios
-      .get(
-        appConfig.serverRoot +
-          "api/Sales?start=" +
-          startingIndex +
-          "&count=" +
-          rowsPerPage
-      )
-      .then(res => {
-        var rows = res.data;
-        var sales = {
-          data: {},
-          index: [],
-          meta: {
-            startingIndex
-          }
-        };
-        for (var i = 0; i < rows.length; i++) {
-          var columns = rows[i].split(",");
-          sales.data[columns[0]] = {
-            groupId: columns[1],
-            itemId: columns[2],
-            quantity: columns[3],
-            date: columns[4],
-            time: columns[5],
-            numberInGroup: columns[6],
-            lastInGroup: columns[7]
+      dispatch({ type: "UPDATE_TOTAL_SALES_COUNT", payload: res.data });
+
+      dispatch(addAppProcessToStack());
+      axios
+        .get(
+          appConfig.serverRoot +
+            "api/Sales?start=" +
+            startingIndex +
+            "&count=" +
+            rowsPerPage
+        )
+        .then(res => {
+          var rows = res.data;
+          var sales = {
+            data: {},
+            index: [],
+            meta: {
+              startingIndex
+            }
           };
-          sales.index[i] = columns[0];
-        }
-        dispatch(updateSales(sales));
-        dispatch(removeAppProcessFromStack());
-      });
+          for (var i = 0; i < rows.length; i++) {
+            var columns = rows[i].split(",");
+            sales.data[columns[0]] = {
+              groupId: columns[1],
+              itemId: columns[2],
+              quantity: columns[3],
+              date: columns[4],
+              time: columns[5],
+              numberInGroup: columns[6],
+              lastInGroup: columns[7]
+            };
+            sales.index[i] = columns[0];
+          }
+          dispatch(updateSales(sales));
+          dispatch(removeAppProcessFromStack());
+        });
+    });
+    dispatch(removeAppProcessFromStack());
   };
 };
 
