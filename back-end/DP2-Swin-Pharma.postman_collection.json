@@ -1,0 +1,618 @@
+{
+	"info": {
+		"_postman_id": "a719c1b7-7518-448f-83bf-52fff0020a46",
+		"name": "DP2",
+		"description": "These requests are for testing the DP2 project web API.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:5001/api/Sales",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "GroupID",
+							"value": "11",
+							"type": "text"
+						},
+						{
+							"key": "ItemID",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "Quantity",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "Date",
+							"value": "date",
+							"type": "text"
+						},
+						{
+							"key": "Time",
+							"value": "time",
+							"type": "text"
+						},
+						{
+							"key": "NumberInGroup",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "LastInGroup",
+							"value": "true",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:5001/api/Sales",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Sales"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Inventory",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "Name",
+							"value": "thing",
+							"type": "text"
+						},
+						{
+							"key": "Brand",
+							"value": "brand name",
+							"type": "text"
+						},
+						{
+							"key": "Barcode",
+							"value": "917dg31d",
+							"type": "text"
+						},
+						{
+							"key": "PurchasePrice",
+							"value": "5.99",
+							"type": "text"
+						},
+						{
+							"key": "RetailPrice",
+							"value": "9.99",
+							"type": "text"
+						},
+						{
+							"key": "Quantity",
+							"value": "100",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:5001/api/Inventory",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Inventory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Sales/1",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "GroupID",
+							"value": "11",
+							"type": "text"
+						},
+						{
+							"key": "ItemID",
+							"value": "88",
+							"type": "text"
+						},
+						{
+							"key": "Quantity",
+							"value": "99",
+							"type": "text"
+						},
+						{
+							"key": "Date",
+							"value": "newdate",
+							"type": "text"
+						},
+						{
+							"key": "Time",
+							"value": "newtime",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:5001/api/Sales/1",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Sales",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Inventory/3",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "Name",
+							"value": "thing",
+							"type": "text"
+						},
+						{
+							"key": "Brand",
+							"value": "brand name",
+							"type": "text"
+						},
+						{
+							"key": "Barcode",
+							"value": "917dg31d",
+							"type": "text"
+						},
+						{
+							"key": "PurchasePrice",
+							"value": "5.99",
+							"type": "text"
+						},
+						{
+							"key": "RetailPrice",
+							"value": "9.99",
+							"type": "text"
+						},
+						{
+							"key": "Quantity",
+							"value": "100",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:5001/api/Inventory/3",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Inventory",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Inventory",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Inventory",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Inventory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Inventory/1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Inventory/1",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Inventory",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Group",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Group",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Group"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Sales?start=0&count=5",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Sales?start=0&count=5",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Sales"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "0"
+						},
+						{
+							"key": "count",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Sales/10",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Sales/86",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Sales",
+						"86"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Report/Week?date=19/9/2018",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Report/Week?date=19/9/2018",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Report",
+						"Week"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "19/9/2018"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Report/Month?date=19/9/2018",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Report/Month?date=19/9/2018",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Report",
+						"Month"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "19/9/2018"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Report/Week/report.csv?date=7/7/2018",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Report/Week/report.csv?date=7/7/2018",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Report",
+						"Week",
+						"report.csv"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "7/7/2018"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Notification?ammount=5",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Notification?ammount=5",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Notification"
+					],
+					"query": [
+						{
+							"key": "ammount",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Forecast/Individual/Week?todayDate=27/9/2018&date=27/9/2018",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Forecast/Individual/Week?todayDate=27/9/2018&date=27/9/2018",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Forecast",
+						"Individual",
+						"Week"
+					],
+					"query": [
+						{
+							"key": "todayDate",
+							"value": "27/9/2018"
+						},
+						{
+							"key": "date",
+							"value": "27/9/2018"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Forecast/Individual/Month?todayDate=27/9/2018&date=27/9/2018",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Forecast/Individual/Month?todayDate=27/9/2018&date=27/9/2018",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Forecast",
+						"Individual",
+						"Month"
+					],
+					"query": [
+						{
+							"key": "todayDate",
+							"value": "27/9/2018"
+						},
+						{
+							"key": "date",
+							"value": "27/9/2018"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Forecast/Group/Week?todayDate=6/10/2018&date=9/10/2018",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Forecast/Group/Week?todayDate=6/10/2018&date=9/10/2018",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Forecast",
+						"Group",
+						"Week"
+					],
+					"query": [
+						{
+							"key": "todayDate",
+							"value": "6/10/2018"
+						},
+						{
+							"key": "date",
+							"value": "9/10/2018"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Forecast/Group/Month?todayDate=6/10/2018&date=9/10/2018",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Forecast/Group/Month?todayDate=6/10/2018&date=9/10/2018",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Forecast",
+						"Group",
+						"Month"
+					],
+					"query": [
+						{
+							"key": "todayDate",
+							"value": "6/10/2018"
+						},
+						{
+							"key": "date",
+							"value": "9/10/2018"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Inventory/3",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Inventory/3",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Inventory",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:5001/api/Sales/1",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:5001/api/Sales/1",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"api",
+						"Sales",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
