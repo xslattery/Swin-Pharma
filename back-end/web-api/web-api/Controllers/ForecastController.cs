@@ -77,7 +77,6 @@ namespace web_api.Controllers
                     result += "\"day\": [ ";
                     for (int i = 0; i < dayLength; i++)
                     {
-                        /*
                         double proffit = 0;
                         DateTime currentDate = startDate.AddDays(i);
 
@@ -99,9 +98,6 @@ namespace web_api.Controllers
                         SalesController.salesTableLock.ReleaseMutex();
 
                         result += proffit + ",";
-                        */
-
-                        result += 0 + ",";
                     }
                     result = result.Remove(result.Length - 1);
                     result += "],";
@@ -212,7 +208,7 @@ namespace web_api.Controllers
                     result += "\"day\": [ ";
                     for (int i = 0; i < dayLength; i++)
                     {
-                        /*
+
                         double proffit = 0;
                         DateTime currentDate = startDate.AddDays(i);
 
@@ -234,8 +230,6 @@ namespace web_api.Controllers
                         SalesController.salesTableLock.ReleaseMutex();
 
                         result += proffit + ",";
-                        */
-                        result += 0 + ",";
                     }
                     result = result.Remove(result.Length - 1);
                     result += "],";
@@ -437,7 +431,14 @@ namespace web_api.Controllers
                 // Forecast Days:
                 for (int i = actualDays; i < 7; i++)
                 {
-                    result += (group.Value.forecastRunningTotal[i] / group.Value.forecastRunningCount[i]) + ",";
+                    if (group.Value.forecastRunningCount[i] > 0)
+                    {
+                        result += (group.Value.forecastRunningTotal[i] / group.Value.forecastRunningCount[i]) + ",";
+                    }
+                    else
+                    {
+                        result += 0 + ",";
+                    }
                 }
                 result = result.Remove(result.Length - 1);
 
@@ -464,34 +465,134 @@ namespace web_api.Controllers
             // ALL groups will be returned together.
 
             // todayDate - will be the day the forcast is being generated (used to know where actual data ends and predictions begin)
-            // date - will be any date in the month the forcast will be generated for
+            // startDate - will be any date in the week the forcast will be generated for
+            DateTime todayDate;
+            DateTime startDate;
+            if (!DateTime.TryParse(date, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out startDate)
+                || !DateTime.TryParse(today, new CultureInfo("en-AU"), System.Globalization.DateTimeStyles.AssumeLocal, out todayDate))
+            {
+                // Failed to parse the dates.
+                return StatusCode(400);
+            }
 
-            // 1. Load Sales & Inventory Controllers (if not already) (for loading the data)
+            // Load Sales & Inventory Controllers (if not already) (for loading the data)
+            if (!InventoryController.itemTableLoadedFromFile)
+            {
+                InventoryController c = new InventoryController();
+            }
+
+            if (!SalesController.salesTableLoadedFromFile)
+            {
+                SalesController sc = new SalesController();
+            }
 
             // 2. Get the date of the start of the month
+            int monthStartOffset = (int)startDate.Day;
+            DateTime monthStartDate = startDate.AddDays(-monthStartOffset);
 
-            // 3. Get the number of days in the month that have alread passed (use start date)
-            // 4. Get the number of days in the month that will be predicted
+            // Get the number of days in the month that have alread passed
+            // Get the number of days in the month that will be predicted
             //    (It is possible for the month to be entiraly existing data or entrialy predictions)
+            TimeSpan differenceDate = todayDate - monthStartDate;
+            int monthStartDate_startDate_difference = differenceDate.Days;
+            int monthLength = DateTime.DaysInMonth(startDate.Year, startDate.Month);
 
-            // 5. Generate a dictionary of groups (Brands)
-            //    This will be done by looping over every item and adding is brand if it does not already exist in the dictionary.
-            // Each entry (Brand) in the diction will contain a class containing:
-            // class {
-            //      string brandName;
-            //      List<double> runningTotal;   <- one entry for each
-            //      List<int> runningCount;      <- day of the month
-            // }
+            int actualDays = monthStartDate_startDate_difference + 1;
+            int forecastDays = 7 - monthStartDate_startDate_difference - 1;
 
-            // 6. Loop over every sale and populate the data in the dictionary
-            //    - Adding to the running total and count for each day
+            if (monthStartDate_startDate_difference >= monthLength)
+            {
+                actualDays = monthLength;
+                forecastDays = 0;
+            }
+            else if (monthStartDate_startDate_difference == 0)
+            {
+                actualDays = 1;
+                forecastDays = monthLength - 1;
+            }
+            else if (monthStartDate_startDate_difference < 0)
+            {
+                actualDays = 0;
+                forecastDays = monthLength;
+            }
+            if (actualDays > monthLength) actualDays = monthLength;
+            if (forecastDays > monthLength) forecastDays = monthLength;
 
-            // 7. Generate a JSON file based off of the data
-            //    - Will require dividing the running totals by the conuts for each day to get the average
+            // Generate a dictionary of groups (Brands)
+            Dictionary<string, GroupForecastData> groupData = new Dictionary<string, GroupForecastData>();
+            InventoryController.itemTableLock.WaitOne();
+            foreach (var item in InventoryController.itemTable)
+            {
+                if (!groupData.ContainsKey(item.brand)) groupData.Add(item.brand, new GroupForecastData(item.brand, monthLength));
+            }
+            InventoryController.itemTableLock.ReleaseMutex();
 
-            return StatusCode(400);
+            // Loop over every sale and populate the data in the dictionary - Adding to the running total and count for each day
+            SalesController.salesTableLock.WaitOne();
+            InventoryController.itemTableLock.WaitOne();
+            foreach (var sale in SalesController.salesTable)
+            {
+                DateTime saleDate;
+                if (DateTime.TryParse(sale.date, new CultureInfo("en-AU"), DateTimeStyles.AssumeLocal, out saleDate))
+                {
+                    // Get the item from the sale (used to find out the sales brand)
+                    InventoryItem item = null;
+                    foreach (var compareItem in InventoryController.itemTable)
+                    {
+                        if (sale.itemID == compareItem.id) item = compareItem;
+                    }
+
+                    int dayOfMonth = (int)saleDate.Day - 1;
+                    groupData[item.brand].forecastRunningTotal[dayOfMonth] += Double.Parse(item.purchasePrice) * sale.quantity;
+                    groupData[item.brand].forecastRunningCount[dayOfMonth] += 1;
+
+                }
+            }
+            InventoryController.itemTableLock.ReleaseMutex();
+            SalesController.salesTableLock.ReleaseMutex();
+
+            // Generate a JSON file based off of the data
+            string result = "{";
+            result += "\"rows\": [";
+            foreach (var group in groupData)
+            {
+                result += "{";
+                result += "\"name\":\"" + group.Value.name + "\",";
+                result += "\"day\": [ ";
+
+                // Actual Days:
+                for (int i = 0; i < actualDays; i++)
+                {
+                    result += 0 + ",";
+                }
+                result = result.Remove(result.Length - 1);
+
+                result += "],";
+                result += "\"forecast\": [ ";
+
+                // Forecast Days:
+                for (int i = actualDays; i < monthLength; i++)
+                {
+                    if (group.Value.forecastRunningCount[i] > 0)
+                    {
+                        result += (group.Value.forecastRunningTotal[i] / group.Value.forecastRunningCount[i]) + ",";
+                    }
+                    else
+                    {
+                        result += 0 + ",";
+                    }
+                }
+                result = result.Remove(result.Length - 1);
+
+                result += "]";
+                result += "},";
+            }
+            result = result.Remove(result.Length - 1);
+            result += "]";
+            result += "}";
+
+            return Ok(result);
         }
-
 
     }
 }
