@@ -177,14 +177,14 @@ class SalesPage extends Component {
                   control={
                     <Radio checked={this.state.reportItemType == "PRODUCT"} />
                   }
-                  label="Product"
+                  label="Individual products"
                 />
                 <FormControlLabel
                   value="BRAND"
                   control={
                     <Radio checked={this.state.reportItemType == "BRAND"} />
                   }
-                  label="Brand"
+                  label="Group by brand"
                 />
               </RadioGroup>
             </Grid>
