@@ -151,6 +151,42 @@ export const fetchReportData = (type, date) => {
   };
 };
 
+export const fetchForecastData = (type, date) => {
+  return dispatch => {
+    dispatch(addAppProcessToStack());
+    date = date.split("-");
+    date = date[2] + "/" + date[1] + "/" + date[0];
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1;
+    var yyyy = today.getFullYear();
+    axios
+      .get(
+        appConfig.serverRoot +
+          "api/Forecast/Individual/" +
+          type +
+          "?todayDate=" +
+          dd +
+          "/" +
+          mm +
+          "/" +
+          yyyy +
+          "&date=" +
+          date
+      )
+      .then(res => {
+        console.log(res.data.row);
+        var reportData = {
+          rows: res.data.row,
+          reportType: type,
+          reportDate: date
+        };
+        dispatch(updateReportData(reportData));
+        dispatch(removeAppProcessFromStack());
+      });
+  };
+};
+
 export const fetchAlerts = () => {
   return dispatch => {
     dispatch(addAppProcessToStack());

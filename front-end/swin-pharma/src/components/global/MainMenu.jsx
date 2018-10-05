@@ -10,6 +10,7 @@ import BubbleChartIcon from "@material-ui/icons/BubbleChartTwoTone";
 import BarChartIcon from "@material-ui/icons/BarChartTwoTone";
 import WidgetsIcon from "@material-ui/icons/WidgetsTwoTone";
 import NotificationsIcon from "@material-ui/icons/NotificationsTwoTone";
+import TrendingUpIcon from "@material-ui/icons/TrendingUpTwoTone";
 import SettingsIcon from "@material-ui/icons/SettingsTwoTone";
 import Badge from "@material-ui/core/Badge";
 
@@ -17,6 +18,7 @@ const primaryNavItems = [
   { display: "Sales", path: "/sales", icon: BubbleChartIcon },
   { display: "Products", path: "/products", icon: WidgetsIcon },
   { display: "Reports", path: "/reports", icon: BarChartIcon },
+  { display: "Forecasts", path: "/forecasts", icon: TrendingUpIcon },
   {
     display: "Alerts",
     path: "/alerts",

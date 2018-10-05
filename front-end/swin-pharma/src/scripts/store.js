@@ -28,6 +28,11 @@ export default () => {
       reportType: "Week",
       reportDate: "NULL"
     },
+    forecastsData: {
+      rows: [],
+      reportType: "Week",
+      reportDate: "NULL"
+    },
     alerts: {
       data: []
     }
